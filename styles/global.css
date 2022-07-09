@@ -1,0 +1,22 @@
+html, body {
+    font-family: Helvetica, sans-serif;
+    margin: 0%;
+    padding: 0%;
+    font-size: 1rem;
+    background-color: azure;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+ul {
+    margin: 0%;
+    padding: 0%;
+    list-style: none;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}

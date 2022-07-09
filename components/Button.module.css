@@ -1,0 +1,25 @@
+.button {
+    border-radius: 1rem;
+    color: white;
+}
+
+.button:hover {
+    background-color: skyblue;
+}
+
+.lg {
+    font-size: 2rem;
+    padding: .5rem 1rem;
+}
+
+.primary {
+    background-color: blue;
+}
+
+.secondary {
+    background-color: blueviolet;
+}
+
+.tertiary {
+    background-color: chocolate;
+}
