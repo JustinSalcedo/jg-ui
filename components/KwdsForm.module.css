@@ -1,0 +1,61 @@
+.container {
+    height: 100%;
+    padding: 1rem;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "form"
+        "list-area";
+    row-gap: 1rem;
+    background-color: white;
+}
+
+.form {
+    grid-area: form;
+    width: 100%;
+}
+
+.toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.radio {
+    margin: 0% 1rem;
+}
+
+.prompt {
+    margin-bottom: 0;
+}
+
+.list-area {
+    grid-area: list-area;
+    display: grid;
+    grid-template-rows: 5fr 1fr;
+    grid-template-areas:
+        "open-d"
+        "close-d";
+    row-gap: .25rem;
+}
+
+.details {
+    grid-area: close-d;
+    border-top: 1px solid lightslategray;
+    padding-top: .25rem;
+}
+
+.details[open] {
+    grid-area: open-d;
+    border: none;
+    padding: 0%;
+}
+
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    max-height: 10rem;
+}

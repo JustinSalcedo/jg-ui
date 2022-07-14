@@ -7,7 +7,7 @@
     grid-template-areas:
         "."
         "container"
-        ".";
+        "navigation";
 }
 
 .home {
@@ -16,6 +16,17 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
+}
+
+.twoPanel {
+    grid-area: container;
+    display: grid;
+    grid-template-columns: .5fr 1fr 1fr .5fr;
+    grid-template-rows: 100%;
+    grid-template-areas:
+        ". panel1 panel2 .";
+    column-gap: 1.33rem;
+    width: 100%;
 }
 
 .threePanel {
@@ -27,4 +38,12 @@
         "panel1 panel2 panel3";
     column-gap: 2rem;
     width: 100%;
+}
+
+.navigation {
+    grid-area: navigation;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
 }

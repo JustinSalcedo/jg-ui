@@ -1,12 +1,13 @@
 import styles from './Button.module.css'
 import cn from 'classnames'
+import { MouseEventHandler } from 'react'
 
-export default function Button({ children, type }: { children: React.ReactNode, type: string }) {
+export default function Button({ children, type, clickHandler }: { children: React.ReactNode, type: string, clickHandler?: MouseEventHandler }) {
   return (
     <button className={`${styles.button} ${styles.lg} ${cn({
         [styles.primary]: type === 'primary',
         [styles.secondary]: type === 'secondary',
         [styles.tertiary]: type === 'tertiary'
-    })}`} >{children}</button>
+    })}`} onClick={clickHandler ? clickHandler : () => {}} >{children}</button>
   )
 }

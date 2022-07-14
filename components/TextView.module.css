@@ -1,0 +1,8 @@
+.view {
+    padding: 1rem;
+    font-size: .75rem;
+    background-color: white;
+    height: 100%;
+    line-height: 1.5;
+    overflow-y: scroll;
+}
