@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from "react"
 import { textToResume } from "../lib/resumeProcessor"
 import IResume from "../types/IResume"
 
-export default function ResumePreview({ text, resume }: { text: string, resume: IResume }) {
+export default function ResumePreview({ id }: { id: string }) {
     const iframeRef = useRef(null)
 
     const [scale, setScale] = useState(1)
 
     useEffect(() => {
         setScale(getScale())
-        // console.log(textToResume(text, resume))
     })
 
     function getScale() {
@@ -22,7 +21,7 @@ export default function ResumePreview({ text, resume }: { text: string, resume: 
 
     return (
         <>
-            <iframe src={`/resumes/preview?scale=${scale}`} title="Preview" ref={iframeRef} ></iframe>
+            <iframe src={`/resumes/preview/${id}?scale=${scale}`} title="Preview" ref={iframeRef} ></iframe>
             {/* @ts-ignore */}
             <style jsx>{`
                 iframe {

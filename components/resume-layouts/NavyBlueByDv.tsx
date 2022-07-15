@@ -1,9 +1,5 @@
-import { useRouter } from "next/router"
-import { useContext } from "react"
-import { NewResumeContext } from "../../context/index"
-import { dateToMonthDay } from "../../lib/formatDate"
-// import dummyResume from "../../lib/resume"
-import IResume from "../../types/IResume"
+import { dateToMonthDay } from "../../lib/formatDate";
+import IResume from "../../types/IResume";
 
 const colors = {
     deepBlue: '#002060',
@@ -12,13 +8,8 @@ const colors = {
     gray: '#dfe0e0'
 }
 
-export default function RenderResume() {
-    const router = useRouter()
-    const scale = router.query.scale ? parseFloat(router.query.scale as string) : 1
-    // const { basics, skills, work, education, certificates } = dummyResume as IResume
-    const { newResume } = useContext(NewResumeContext) as { newResume: IResume }
-    // console.log(newResume)
-    const { basics, skills, work, education, certificates } = newResume
+export default function NavyBlueByDv({ resume, scale }: { resume: IResume, scale: number }) {
+    const { basics, skills, work, education, certificates } = resume
     const coursework = education.filter(({ studyType }) => studyType === "Coursework")
 
     return (

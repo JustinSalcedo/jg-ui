@@ -1,14 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import IResume from "../../../types/IResume";
+import { IApplication } from "../../../types/index";
 
-export const API_URL = "http://localhost:3031/api/resume"
+export const API_URL = "http://localhost:3031/api/application"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         if (req.method === 'POST') {
-            const { applicationId, resume: inputResume } = req.body
-            const newResume = await createResume(applicationId, inputResume)
-            res.status(201).json(newResume)
+            const { application: inputApplication } = req.body
+            const newApplication = await createApplication(inputApplication)
+            res.status(201).json(newApplication)
         }
     } catch (error) {
         const { message }: Error = error
@@ -16,21 +16,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 }
 
-async function createResume(applicationId: string, inputResume: IResume): Promise<IResume> {
+async function createApplication(inputApplication: IApplication): Promise<IApplication> {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ applicationId, resume: inputResume})
+            body: JSON.stringify(inputApplication)
         })
-        const resume = await response.json()
+        const application = await response.json()
         if (response.status !== 201) {
-            const { message }: Error = resume.errors
+            const { message }: Error = application.errors
             throw new Error(message);
         }
-        return resume
+        return application
     } catch (error) {
         throw error
     }

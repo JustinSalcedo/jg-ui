@@ -346,5 +346,8 @@
      lastModified?: string;
      [k: string]: unknown;
    };
+   createdAt?: Date
+   updatedAt?: Date
+   __v?: number
  }
  
