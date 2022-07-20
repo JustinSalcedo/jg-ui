@@ -9,7 +9,7 @@ import ResumePreview from "../components/ResumePreview";
 import DraftTxtArea from "../components/DraftTxtArea";
 import Textarea from "../components/Textarea";
 import TextView from "../components/TextView";
-import { NewResumeContext } from "../context/index";
+import { UserBasicsContext } from "../context/index";
 import dummyResume from "../lib/dummyResume";
 import { resumeToText, textToResume } from "../lib/resumeProcessor";
 import { IApplication, ContainerView, Stage, ISkillKwd, IElementType, IElement } from "../types/index";
@@ -30,6 +30,8 @@ const typeToKey = {
 const dummy = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 export default function NewApplication() {
+    const { userBasics } = useContext(UserBasicsContext)
+
     const [jobDescription, setJobDescription] = useState(dummy)
     const [containerView, setContainerView] = useState('twoPanel') as [ContainerView, Dispatch<SetStateAction<ContainerView>>]
     const [stage, setStage] = useState('writeApplication') as [Stage, Dispatch<SetStateAction<Stage>>]
@@ -42,12 +44,12 @@ export default function NewApplication() {
     const [inputTerm, setInputTerm] = useState("")
     const [skills, setSkills] = useState([])
     const [resps, setResps] = useState([])
-    const [draft, setDraft] = useState(resumeToText(new Resume(true).getResume()))
+    const [draft, setDraft] = useState(resumeToText(new Resume(true, userBasics).getResume()))
     // If resume is 'cold', we can post an update (in formatting resume stage)
     const [coldResume, setColdResume] = useState(true)
     // Set the cool-down interval before next update
     const [cooldown, setCooldown] = useState(null)
-    const [newResume, setNewResume] = useState(new Resume().getResume()) as [IResume, Dispatch<SetStateAction<IResume>>]
+    const [newResume, setNewResume] = useState(new Resume(false, userBasics).getResume()) as [IResume, Dispatch<SetStateAction<IResume>>]
     // const [printAction, setPrintAction] = useState(null)
     let printAction = null
 

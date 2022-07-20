@@ -5,6 +5,9 @@ import styles from './Form.module.css';
 import IResume from "../types/IResume";
 
 export default function Form({ formData, formHandler, action }: {
+    /* Form only accepts resumes and applications,
+        which are the only API entry points available
+        for POST */
     formData: IResume | IApplication
     formHandler: ChangeEventHandler
     action: string

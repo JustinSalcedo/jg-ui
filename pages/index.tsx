@@ -17,7 +17,11 @@ export default function Home() {
                     <Button type="primary">New application</Button>
                 </a>
             </Link>
-            <Button type="tertiary">Profile info</Button>
+            <Link href="/profile-info">
+                <a>
+                    <Button type="tertiary">Profile info</Button>
+                </a>
+            </Link>
         </Layout>
     )
 }

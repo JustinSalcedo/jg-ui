@@ -94,6 +94,10 @@ export default class Resume {
         this.basics = basics || this.defaultBasics
     }
 
+    public getBasics() {
+        return this.basics
+    }
+
     public getSkill() {
         return this.skill
     }
