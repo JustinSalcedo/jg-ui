@@ -67,6 +67,14 @@ const sampleResume = {
         ]
       }
     ],
+    "certificates": [
+      {
+        "name": "",
+        "date": defaultDate,
+        "url": "",
+        "issuer": ""
+      }
+    ],
     "awards": [
       {
         "title": "",

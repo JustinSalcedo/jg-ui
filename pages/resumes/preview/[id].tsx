@@ -1,12 +1,14 @@
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
+import { useEffect, useState } from "react"
 import NavyBlueByDv from "../../../components/resume-layouts/NavyBlueByDv"
 import IResume from "../../../types/IResume"
+import { getResume as getFreshResume } from "../../../lib/clientAPI"
 
 const API_URL = "http://localhost:3031/api/resume"
 
 export async function getServerSideProps({ params, query }: GetServerSidePropsContext) {
     const { id } = params
-    const { scale } = query
+    const { scale, page } = query
     const resume = await getResume(id as string)
     if (!resume) {
         return {
@@ -14,12 +16,27 @@ export async function getServerSideProps({ params, query }: GetServerSidePropsCo
         }
     }
 
-    return { props: { resume, scale: scale ? parseFloat(scale as string) : 1 } }
+    return { props: {
+        resume, scale: scale ? parseFloat(scale as string) : 1, page: page ? parseInt(page as string) : 1
+    } }
 }
 
-export default function RenderResume({ resume, scale }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function RenderResume({ resume, scale, page }: { resume: IResume, scale: number, page: number } /*InferGetServerSidePropsType<typeof getServerSideProps>*/ ) {
+    // const refresh = useRefreshRoot()
+    const [freshResume, setFreshResume] = useState(resume)
+    // let refresh = null
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            getFreshResume(freshResume._id)
+                .then(resume => setFreshResume(resume))
+        }, 5000)
+
+        return () => clearInterval(interval)
+    }, [freshResume])
+
     return (
-        <NavyBlueByDv resume={resume} scale={scale} />
+        <NavyBlueByDv resume={freshResume} scale={scale} page={page} />
     )
 }
 

@@ -1,15 +1,15 @@
-import { ChangeEvent, FormEvent, MouseEvent, useState } from 'react';
+import { ChangeEvent, Dispatch, FormEvent, MouseEvent, SetStateAction, useState } from 'react';
 import styles from './KwdsForm.module.css';
 import utilStyles from '../styles/utils.module.css';
 import KwdItem from './KwdItem';
 
-export default function KwdsForm({ skills, resps, addKeyword, deleteKeyword }: {
+export default function KwdsForm({ value, setValue, skills, resps, addKeyword, deleteKeyword }: {
+    value: string, setValue: Dispatch<SetStateAction<string>>
     skills: string[], resps: string[]
     addKeyword: (key: string, term: string) => void
     deleteKeyword: (key: 'skills' | 'resps', id: string | number) => void
 }) {
     const [key, setKey] = useState('skills')
-    const [value, setValue] = useState('')
     const [viewSkills, setViewSkills] = useState(true)
 
     function handleToggle(e: ChangeEvent) {
@@ -26,8 +26,10 @@ export default function KwdsForm({ skills, resps, addKeyword, deleteKeyword }: {
 
     function handleSubmission(e: FormEvent) {
         e.preventDefault()
-        addKeyword(key, value)
-        setValue('')
+        if (value) {
+            addKeyword(key, value)
+            setValue('')
+        }
     }
 
     function toggleViews(e: MouseEvent) {

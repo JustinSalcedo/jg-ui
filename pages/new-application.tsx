@@ -10,14 +10,23 @@ import DraftTxtArea from "../components/DraftTxtArea";
 import Textarea from "../components/Textarea";
 import TextView from "../components/TextView";
 import { NewResumeContext } from "../context/index";
-import dummyResume from "../lib/resume";
+import dummyResume from "../lib/dummyResume";
 import { resumeToText, textToResume } from "../lib/resumeProcessor";
-import { IApplication, ContainerView, Stage, ISkillKwd } from "../types/index";
+import { IApplication, ContainerView, Stage, ISkillKwd, IElementType, IElement } from "../types/index";
 import IResume from "../types/IResume";
 import sampleResume from "../lib/sampleResume";
 import { addLists, createApplication, createResume, editApplication, editResume } from "../lib/clientAPI";
+import Button from "../components/Button";
+import Resume from "../lib/Resume";
 
 const stageValues: Stage[] = ['writeApplication', 'captureKeywords', 'writeResume', 'formatResume']
+const typeToKey = {
+    skill: "skills",
+    education: "education",
+    cert: "certificates",
+    work: "work",
+    project: "projects"
+}
 const dummy = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 export default function NewApplication() {
@@ -30,15 +39,17 @@ export default function NewApplication() {
         position: "Carpenter",
         website: "https://panini.com"
     }) as [IApplication, Dispatch<SetStateAction<IApplication>>]
+    const [inputTerm, setInputTerm] = useState("")
     const [skills, setSkills] = useState([])
     const [resps, setResps] = useState([])
-    const [draft, setDraft] = useState(resumeToText(dummyResume))
+    const [draft, setDraft] = useState(resumeToText(new Resume(true).getResume()))
     // If resume is 'cold', we can post an update (in formatting resume stage)
     const [coldResume, setColdResume] = useState(true)
     // Set the cool-down interval before next update
     const [cooldown, setCooldown] = useState(null)
-    // const { newResume, handleNewResume } = useContext(NewResumeContext) as { newResume: IResume, handleNewResume: (resume: IResume) => void }
-    const [newResume, setNewResume] = useState(sampleResume) as [IResume, Dispatch<SetStateAction<IResume>>]
+    const [newResume, setNewResume] = useState(new Resume().getResume()) as [IResume, Dispatch<SetStateAction<IResume>>]
+    // const [printAction, setPrintAction] = useState(null)
+    let printAction = null
 
     function handleTextarea(e: ChangeEvent) {
         const { value } = e.target as HTMLTextAreaElement
@@ -71,9 +82,20 @@ export default function NewApplication() {
         }
     }
 
-    function handleDraft(e: ChangeEvent) {
-        const { value } = e.target as HTMLTextAreaElement
-        setDraft(value)
+    function handleNewElement(type: IElementType, element: IElement) {
+        setNewResume(resume => ({
+            ...resume,
+            [typeToKey[type]]: [ ...resume[typeToKey[type]], element ]
+        }))
+    }
+
+    function handleDraft(e: ChangeEvent, newDraft?: string) {
+        if (newDraft) {
+            setDraft(newDraft)
+        } else {
+            const { value } = e.target as HTMLTextAreaElement
+            setDraft(value)
+        }
         if (stage === "formatResume") {
             saveDraft()
         }
@@ -94,22 +116,23 @@ export default function NewApplication() {
 
     function saveDraft() {
         if (coldResume) {
-            console.log('Saving resume')
             const updatedResume = textToResume(draft, newResume)
             const { _id } = newResume
-            // console.log(newResume)
             editResume(_id, updatedResume)
                 .then(resume => {
                     setNewResume(resume)
                     setColdResume(false)
                     setCooldown(setInterval(() => {
                         setColdResume(true),
-                        console.log(coldResume)
                         setCooldown(cooldown => clearInterval(cooldown))
                     }, 5000))
                 })
                 .catch(e => alert(e))
         }
+    }
+
+    function handlePrint(callback: () => void) {
+        return callback()
     }
 
     function determineStagePosition(): 'first' | 'mid' | 'last' {
@@ -157,17 +180,22 @@ export default function NewApplication() {
                 }
             }
             if (stage === "writeResume") {
+                const parsedResume = textToResume(draft, newResume)
                 if(!newResume._id) {
                     console.log("Creating resume")
-                    const parsedResume = textToResume(draft, newResume)
-                    // console.log(parsedResume)
                     createResume(applicationMetadata._id, parsedResume)
                         .then(resume => {
-                            console.log(resume)
                             setNewResume(resume)
                             navigateStages(way)
                         })
                         .catch(e => alert(e))
+                } else {
+                    console.log("Updating resume")
+                    editResume(newResume._id, parsedResume)
+                        .then(resume => {
+                            setNewResume(resume)
+                            navigateStages(way)
+                        })
                 }
             }
         } else navigateStages(way)
@@ -188,6 +216,7 @@ export default function NewApplication() {
             containerView={containerView}
             navigation={determineStagePosition()}
             navigateStages={processData.bind(this)}
+            lastButton={<Button type="tertiary" clickHandler={() => handlePrint(printAction)} >Print</Button>}
         >
             <Head>
                 <title>{siteTitle}</title>
@@ -211,10 +240,14 @@ export default function NewApplication() {
             {stage === "captureKeywords" && (
                 <>
                     <Panel place={1}>
-                        <TextView content={jobDescription}></TextView>
+                        <TextView
+                            input={inputTerm} content={jobDescription}
+                            skills={skills} resps={resps}
+                        />
                     </Panel>
                     <Panel place={2}>
                         <KwdsForm
+                            value={inputTerm} setValue={setInputTerm.bind(this)}
                             skills={skills} resps={resps}
                             addKeyword={addKeyword.bind(this)}
                             deleteKeyword={deleteKeyword.bind(this)}
@@ -226,13 +259,16 @@ export default function NewApplication() {
             {stage === "writeResume" && (
                 <>
                     <Panel place={1}>
-                        <TextView content={jobDescription + '\n' + jobDescription}></TextView>
+                        <TextView
+                            input={inputTerm} content={jobDescription}
+                            skills={skills} resps={resps}
+                        />
                     </Panel>
                     <Panel place={2}>
                         <MatchCounter skills={skills} resps={resps} resume={draft.toLowerCase()} ></MatchCounter>
                     </Panel>
                     <Panel place={3}>
-                        <DraftTxtArea text={draft} handler={handleDraft} />
+                        <DraftTxtArea text={draft} handler={handleDraft} updateResume={handleNewElement} />
                     </Panel>
                 </>
             )}
@@ -240,10 +276,10 @@ export default function NewApplication() {
             {stage === "formatResume" && (
                 <>
                     <Panel place={1}>
-                        <DraftTxtArea text={draft} handler={handleDraft} />
+                        <DraftTxtArea text={draft} handler={handleDraft} updateResume={handleNewElement} />
                     </Panel>
                     <Panel place={2}>
-                        <ResumePreview id={newResume._id} />
+                        <ResumePreview id={newResume._id} setPrintAction={callback => printAction = callback} />
                     </Panel>
                 </>
             )}

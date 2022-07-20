@@ -1,5 +1,11 @@
+import { ICertificate, IEducationItem, IProject, ISkill, IWorkItem } from "./IResume"
+
 export type Stage = 'writeApplication' | 'captureKeywords' | 'writeResume' | 'formatResume'
 export type ContainerView = 'home' | 'threePanel' | 'twoPanel'
+
+export type IElement = ICertificate | IEducationItem | IProject | ISkill | IWorkItem
+export type IElementType = 'skill' | 'education' | 'cert' | 'work' | 'project'
+
 export type ISkillKwd = {
     n?: number
     keyword: string

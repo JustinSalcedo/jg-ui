@@ -5,11 +5,12 @@ import Button from './Button'
 
 export const siteTitle = "Job Gatherer"
 
-export default function Layout({ children, containerView, navigation, navigateStages }: {
+export default function Layout({ children, containerView, navigation, navigateStages, lastButton }: {
   children: React.ReactNode
   containerView: ContainerView
   navigation?: 'first' | 'mid' | 'last'
   navigateStages?: (way: 1 | -1) => void
+  lastButton?: React.ReactNode
 }) {
 
   return (
@@ -35,6 +36,7 @@ export default function Layout({ children, containerView, navigation, navigateSt
         {navigation === 'last' && (
           <div className={styles.navigation}>
               <Button type='secondary' clickHandler={() => navigateStages(-1)}>Back</Button>
+              {lastButton || ''}
           </div>
         )}
     </div>

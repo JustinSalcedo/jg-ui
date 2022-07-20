@@ -1,0 +1,14 @@
+.fitting {
+    background-color: forestgreen;
+    color: white;
+}
+
+.warning {
+    background-color: crimson;
+    color: white;
+}
+
+.suggestion {
+    background-color: gold;
+    color: black
+}

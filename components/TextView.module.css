@@ -6,3 +6,17 @@
     line-height: 1.5;
     overflow-y: scroll;
 }
+
+.view span {
+    background-color: lightpink;
+}
+
+.view em {
+    font-style: normal;
+    background-color: lightskyblue;
+}
+
+.view ins {
+    text-decoration: none;
+    background-color: yellow;
+}
