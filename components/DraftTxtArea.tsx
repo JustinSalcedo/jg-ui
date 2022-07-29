@@ -53,7 +53,6 @@ export default function ResumeTxtArea({ text, handler, updateResume } : {
             work: { stateHandler: setWork, defaultState: () => resume.getWork() },
             project: { stateHandler: setProject, defaultState: () => resume.getProject() }
         }
-        console.log(wrap[type].defaultState())
         return wrap[type].stateHandler(wrap[type].defaultState())
     }
 

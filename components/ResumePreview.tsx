@@ -11,18 +11,17 @@ export default function ResumePreview({ id, setPrintAction }: {
     const documentHeight = 11 * 96
 
     const [scale, setScale] = useState(1)
-    // const [height, setHeight] = useState(documentHeight)
+    const [height, setHeight] = useState(documentHeight)
     const [page, setPage] = useState(1)
-    const [pageData, setPageData] = useState([null, { height: documentHeight }, { height: documentHeight }])
+    const [skillset, setSkillset] = useState(0)
 
     useEffect(() => {
         setPrintAction(printResume.bind(this))
         setScale(getScale())
-        setResizeListener()
     })
 
     function printResume() {
-        const popWindow = window.open(`/resumes/preview/${id}`, 'PRINT', `height=${documentHeight},width=${documentWidth}`)
+        const popWindow = window.open(`/resumes/preview/${id}?skillview=${skillset}&page=${page}`, 'PRINT', `height=${documentHeight},width=${documentWidth}`)
 
         popWindow.document.close()
         popWindow.focus()
@@ -37,30 +36,30 @@ export default function ResumePreview({ id, setPrintAction }: {
         return scaleX100 / 100 // back to normal scale (0 to 1)
     }
 
-    function setResizeListener() {
-        const { contentDocument } = iframeRef.current as HTMLIFrameElement
-        const { body } = contentDocument
-        if (body) {
-            setPageData(pages => pages.map((pageData, index) => {
-                if (page === index) {
-                    return { height: body.offsetHeight / scale }
-                }
-                return pageData
-            }))
-        }
-    }
-
     function handlePage(_e: MouseEvent) {
         setPage(page => page === 1 ? 2 : 1)
     }
 
-    const { height } = pageData[page]
+    function measureHeight() {
+        const { contentDocument } = iframeRef.current as HTMLIFrameElement
+        const { body } = contentDocument
+        if (body) {
+            setHeight(body.offsetHeight / scale)
+        }
+    }
+
+    function swapSkillset() {
+        setSkillset(set => (set + 1) % 3)
+        console.log(skillset)
+    }
 
     return (
         <>
-            <iframe src={`/resumes/preview/${id}?scale=${scale}&page=${page}`} title="Preview" ref={iframeRef} onLoad={setResizeListener}></iframe>
+            <iframe src={`/resumes/preview/${id}?scale=${scale}&page=${page}&skillview=${skillset}`} title="Preview" ref={iframeRef} ></iframe>
             <div>
                 <span className="arrow" onClick={handlePage}>{page === 1 ?'↓' : '↑'}</span>
+                <span className="swap" onClick={swapSkillset}>{skillset ? (skillset === 1 ? 'K' : 'S+K') : 'S'}</span>
+                <span className="measure" onClick={measureHeight}>⟳</span>
                 <span className={cn({
                     [styles.fitting]: height <= documentHeight,
                     [styles.warning]: height > documentHeight,
@@ -85,8 +84,9 @@ export default function ResumePreview({ id, setPrintAction }: {
                     padding: .5rem;
                     border-radius: .5rem;
                     margin-right: .5rem;
+                    line-height: .75;
                 }
-                .arrow {
+                .arrow, .measure, .swap {
                     background-color: white;
                     cursor: pointer;
                 }

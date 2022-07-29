@@ -8,7 +8,7 @@ const colors = {
     gray: '#dfe0e0'
 }
 
-export default function NavyBlueByDv({ resume, scale, page }: { resume: IResume, scale: number, page: number }) {
+export default function NavyBlueByDv({ resume, scale, page, skillview }: { resume: IResume, scale: number, page: number, skillview: number }) {
     const { basics, skills, work, education, certificates, projects } = resume
     const coursework = education.filter(({ studyType }) => studyType === "Coursework")
 
@@ -36,8 +36,8 @@ export default function NavyBlueByDv({ resume, scale, page }: { resume: IResume,
                     </ul>
                     <h3>Skills</h3>
                     <ul className="skillset">
-                        {skills.map(({ name: skill }, index) => (
-                            <li key={index}>{skill}</li>
+                        {skills.map(({ name: skill, keywords }, index) => (
+                            <li key={index}>{skillview ? (skillview === 1 ? keywords.join(', ') : skill + ': ' + keywords.join(', ')) : skill}</li>
                         ))}
                     </ul>
                     <h3>Education</h3>
@@ -45,7 +45,7 @@ export default function NavyBlueByDv({ resume, scale, page }: { resume: IResume,
                             {education.filter(({ studyType }) => studyType !== 'Coursework').map((edu, index) => (
                                 <div className="education-xp" key={index}>
                                     {/* TODO: Add specialty and location to the resume schema */}
-                                    <div className="degree">{edu.studyType}, {edu.area}, {edu.specialization ? (<span className="special">{edu.specialization}</span>) : ''}</div><br/><span className="date">{edu.endDate ? dateToMonthDay(edu.endDate) : 'In Progress'}</span>
+                                    <div className="degree">{edu.studyType}, {edu.area}{edu.specialization ? (<span className="special">, {edu.specialization}</span>) : ''}</div><br/><span className="date">{edu.endDate ? dateToMonthDay(edu.endDate) : 'In Progress'}</span>
                                     <div className="school"><a href={edu.url ? edu.url : '#'}>{edu.institution}</a>{edu.location ? (<span className="location"> - {edu.location}</span>) : ''}</div>
                                     <div className="coursework">{edu.courses.join(', ')}</div>
                                 </div>
@@ -99,24 +99,26 @@ export default function NavyBlueByDv({ resume, scale, page }: { resume: IResume,
             </>) : ''}
             {page === 2 ? (<>
                 <main>
-                <h3>Portfolio</h3>
-                    <section className="portfolio">
-                        {projects.map((proj, index) => (
-                            <div className="project" key={index}>
-                                <div className="proj-title">
-                                    {/* TODO: Format date */}
-                                    <a href={proj.url ? proj.url : '#'}><h4>{proj.name} {proj.type ? `(${proj.type})` : ''}</h4></a><span className="date">{` │ ${proj.startDate ? dateToMonthDay(proj.startDate) + ' - ' : ''}${proj.endDate ? dateToMonthDay(proj.endDate) : 'Work in progress'}`}</span>
-                                </div>
-                                <p className="keywords">{proj.keywords.join(', ')}</p>
-                                <ul className="description">
-                                    {proj.highlights.map((high, index) => (
-                                        <li key={index}>{high}</li>
-                                    ))}
-                                </ul>
-                                {/* <p className="achievements"><span>Key Achievements: <br/></span> Stablished the former web application architecture, led technical documentation, and managed MVP's production through a waterfall-alike workflow in a remote-work environment.</p> */}
+                <section className="portfolio">
+                    <h3>Portfolio</h3>
+                    {projects.map((proj, index) => (
+                        <div className="project" key={index}>
+                            <div className="proj-title">
+                                {/* TODO: Format date */}
+                                <a href={proj.url ? proj.url : '#'}><h4>{proj.name} {proj.type ? `(${proj.type})` : ''}</h4></a><span className="date">{` │ ${proj.startDate ? dateToMonthDay(proj.startDate) + ' - ' : ''}${proj.endDate ? dateToMonthDay(proj.endDate) : 'Work in progress'}`}</span>
                             </div>
-                        ))}
-                    </section>
+                            {proj.keywords && proj.keywords.length ? (
+                                <p className="keywords">{proj.keywords.join(', ')}</p>
+                            ) : ''}
+                            <ul className="description">
+                                {proj.highlights.map((high, index) => (
+                                    <li key={index}>{high}</li>
+                                ))}
+                            </ul>
+                            {/* <p className="achievements"><span>Key Achievements: <br/></span> Stablished the former web application architecture, led technical documentation, and managed MVP's production through a waterfall-alike workflow in a remote-work environment.</p> */}
+                        </div>
+                    ))}
+                </section>
                 </main>
             </>) : ''}
             {/* @ts-ignore */}
@@ -296,6 +298,9 @@ export default function NavyBlueByDv({ resume, scale, page }: { resume: IResume,
                 .work-xp > .achievements > span {
                     font-weight: bold;
                     color: ${colors.navyBlue};
+                }
+                .portfolio {
+                    padding-top: ${1 * scale}rem;
                 }
                 .project {
                     margin: 0%;

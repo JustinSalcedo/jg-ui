@@ -16,6 +16,7 @@ import IResume from "../types/IResume";
 import { addLists, createApplication, createResume, editApplication, editResume } from "../lib/clientAPI";
 import Button from "../components/Button";
 import Resume from "../lib/Resume";
+import Link from "next/link";
 
 const stageValues: Stage[] = ['writeApplication', 'captureKeywords', 'writeResume', 'formatResume']
 const typeToKey = {
@@ -111,6 +112,9 @@ export default function NewApplication() {
             }
             return application
         })
+        if (application.position) {
+            setNewResume(resume => ({ ...resume, basics: { ...resume.basics, label: application.position } }))
+        }
     }
 
     function saveDraft() {
@@ -180,6 +184,7 @@ export default function NewApplication() {
             }
             if (stage === "writeResume") {
                 const parsedResume = textToResume(draft, newResume)
+                console.log(parsedResume)
                 if(!newResume._id) {
                     console.log("Creating resume")
                     createResume(applicationMetadata._id, parsedResume)
@@ -215,6 +220,7 @@ export default function NewApplication() {
             containerView={containerView}
             navigation={determineStagePosition()}
             navigateStages={processData.bind(this)}
+            firstButton={<Link href="/"><a><Button type="secondary">Home</Button></a></Link>}
             lastButton={<Button type="tertiary" clickHandler={() => handlePrint(printAction)} >Print</Button>}
         >
             <Head>

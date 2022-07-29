@@ -8,7 +8,7 @@ const API_URL = "http://localhost:3031/api/resume"
 
 export async function getServerSideProps({ params, query }: GetServerSidePropsContext) {
     const { id } = params
-    const { scale, page } = query
+    const { scale, page, skillview } = query
     const resume = await getResume(id as string)
     if (!resume) {
         return {
@@ -17,11 +17,14 @@ export async function getServerSideProps({ params, query }: GetServerSidePropsCo
     }
 
     return { props: {
-        resume, scale: scale ? parseFloat(scale as string) : 1, page: page ? parseInt(page as string) : 1
+        resume,
+        scale: scale ? parseFloat(scale as string) : 1,
+        page: page ? parseInt(page as string) : 1,
+        skillview: skillview ? parseInt(skillview as string) : 0,
     } }
 }
 
-export default function RenderResume({ resume, scale, page }: { resume: IResume, scale: number, page: number } /*InferGetServerSidePropsType<typeof getServerSideProps>*/ ) {
+export default function RenderResume({ resume, scale, page, skillview }: { resume: IResume, scale: number, page: number, skillview: number } /*InferGetServerSidePropsType<typeof getServerSideProps>*/ ) {
     // const refresh = useRefreshRoot()
     const [freshResume, setFreshResume] = useState(resume)
     // let refresh = null
@@ -36,7 +39,7 @@ export default function RenderResume({ resume, scale, page }: { resume: IResume,
     }, [freshResume])
 
     return (
-        <NavyBlueByDv resume={freshResume} scale={scale} page={page} />
+        <NavyBlueByDv resume={freshResume} scale={scale} page={page} skillview={skillview} />
     )
 }
 

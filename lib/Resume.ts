@@ -38,6 +38,7 @@ export default class Resume {
         "url": "",
         "area": "",
         "studyType": "",
+        "specialization": "",
         "startDate": this.defaultDate,
         "endDate": this.defaultDate,
         "score": "",
@@ -155,8 +156,9 @@ export default class Resume {
                     populated[key] = this.setPlaceholder(value, key)
                 } else populated[key] = this.setPlaceholder(value)
             }
-            if (typeof(value) === "string" && !value) {
-                populated[key] = key
+            if (typeof(value) === "string") {
+                if (!value) populated[key] = key
+                else populated[key] = value
             }
         })
         return populated
