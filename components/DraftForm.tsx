@@ -1,7 +1,7 @@
 import { ChangeEvent, Dispatch, FormEvent, HTMLInputTypeAttribute, SetStateAction, useState } from "react";
 import { IElement, IElementType } from "../types/index";
 import { ICertificate, IEducationItem, IProject, ISkill, IWorkItem } from "../types/IResume";
-import Input from "./Input";
+import Input from "./common/Input";
 
 const ELEMENT_TYPES = [ 'skill', 'education', 'cert', 'work', 'project' ]
 

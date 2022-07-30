@@ -2,7 +2,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useEffect, useState } from "react"
 import NavyBlueByDv from "../../../components/resume-layouts/NavyBlueByDv"
 import IResume from "../../../types/IResume"
-import { getResume as getFreshResume } from "../../../lib/clientAPI"
+import { getResume as getFreshResume } from "../../../api/client"
 
 const API_URL = "http://localhost:3031/api/resume"
 

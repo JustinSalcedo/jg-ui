@@ -1,20 +1,20 @@
 import Head from "next/head";
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from "react";
-import Form from "../components/Form";
+import Form from "../components/common/Form";
 import KwdsForm from "../components/KwdsForm";
-import Layout, { siteTitle } from "../components/Layout";
+import Layout, { siteTitle } from "../layout/Main";
 import MatchCounter from "../components/MatchCounter";
-import Panel from "../components/Panel";
+import Panel from "../components/common/Panel";
 import ResumePreview from "../components/ResumePreview";
 import DraftTxtArea from "../components/DraftTxtArea";
 import Textarea from "../components/Textarea";
 import TextView from "../components/TextView";
-import { UserBasicsContext } from "../context/index";
+import { UserBasicsContext } from "../contexts/index";
 import { resumeToText, textToResume } from "../lib/resumeProcessor";
-import { IApplication, ContainerView, Stage, IElementType, IElement } from "../types/index";
+import { IApplication, ContainerView, Stage, IElementType, IElement } from "../types";
 import IResume from "../types/IResume";
-import { addLists, createApplication, createResume, editApplication, editResume } from "../lib/clientAPI";
-import Button from "../components/Button";
+import { addLists, createApplication, createResume, editApplication, editResume } from "../api/client";
+import Button from "../components/common/Button";
 import Resume from "../lib/Resume";
 import Link from "next/link";
 

@@ -1,5 +1,5 @@
 import { ChangeEventHandler, HTMLInputTypeAttribute } from 'react';
-import formatLabels from '../lib/formatLabels';
+import formatLabels from '../../../lib/formatLabels';
 import styles from './Input.module.css';
 
 export default function Input({ name, label, value, type, handler } : {

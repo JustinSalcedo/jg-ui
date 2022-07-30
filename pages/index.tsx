@@ -1,8 +1,8 @@
 import Head from "next/head"
 import Link from "next/link"
-import Button from "../components/Button"
-import Layout from "../components/Layout"
-import { siteTitle } from "../components/Layout"
+import Button from "../components/common/Button"
+import Layout from "../layout/Main"
+import { siteTitle } from "../layout/Main"
 
 export default function Home() {
     return (

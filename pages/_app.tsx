@@ -2,7 +2,7 @@ import '../styles/global.css'
 import { AppProps } from "next/app";
 import { useEffect, useState } from 'react';
 import { IBasics } from '../types/IResume';
-import { UserBasicsContext } from '../context/index';
+import { UserBasicsContext } from '../contexts/index';
 import Resume from '../lib/Resume';
 
 export default function App({ Component, pageProps }: AppProps) {

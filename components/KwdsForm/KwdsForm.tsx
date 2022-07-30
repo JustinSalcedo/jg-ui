@@ -1,7 +1,7 @@
 import { ChangeEvent, Dispatch, FormEvent, MouseEvent, SetStateAction, useState } from 'react';
 import styles from './KwdsForm.module.css';
-import utilStyles from '../styles/utils.module.css';
-import KwdItem from './KwdItem';
+import utilStyles from '../../styles/utils.module.css';
+import KwdItem from '../KwdItem';
 
 export default function KwdsForm({ value, setValue, skills, resps, addKeyword, deleteKeyword }: {
     value: string, setValue: Dispatch<SetStateAction<string>>

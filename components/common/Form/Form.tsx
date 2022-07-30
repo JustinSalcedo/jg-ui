@@ -1,8 +1,8 @@
 import { ChangeEventHandler } from "react"
-import { IApplication } from "../types/index"
-import Input from "./Input"
+import { IApplication } from "../../../types"
+import Input from "../Input"
 import styles from './Form.module.css';
-import IResume from "../types/IResume";
+import IResume from "../../../types/IResume";
 
 export default function Form({ formData, formHandler, action }: {
     /* Form only accepts resumes and applications,

@@ -1,10 +1,9 @@
 import Head from "next/head";
 import { ChangeEvent, useContext } from "react";
-import Layout, { siteTitle } from "../components/Layout";
-import Panel from "../components/Panel";
-import { UserBasicsContext } from "../context/index";
-import styles from '../components/Form.module.css'
-import Input from "../components/Input";
+import Layout, { siteTitle } from "../layout/Main";
+import Panel from "../components/common/Panel";
+import { UserBasicsContext } from "../contexts/index";
+import Input from "../components/common/Input";
 import { useRouter } from "next/router";
 
 export default function ProfileInfo() {
@@ -55,7 +54,7 @@ export default function ProfileInfo() {
 
             <Panel place={2}>
                 {/* TODO: map input types for url, email, phone, and image */}
-                <form className={styles.form}>
+                <form>
                     {Object.entries(userBasics).map(([key, value]) => !['location', 'profiles'].includes(key) ? (
                         <Input key={key} name={key} value={value as string} handler={handleBasics} />
                     ) : '')}
@@ -67,6 +66,22 @@ export default function ProfileInfo() {
                         <Input key={'profile_' + key} name={'profile_' + key} value={value as string} handler={handleProfile} />
                     ))}
                 </form>
+                {/* @ts-ignore */}
+                <style jsx>{`
+                    form {
+                        width: 100%;
+                        height: 100%;
+                        overflow-y: scroll;
+                        font-size: .75rem;
+                        padding: 1rem;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        grid-template-rows: min-content;
+                        column-gap: 1rem;
+                        row-gap: 1rem;
+                        background-color: white;
+                    }
+                `}</style>
             </Panel>
         </Layout>
     )

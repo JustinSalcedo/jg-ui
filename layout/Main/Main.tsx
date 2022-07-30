@@ -1,7 +1,7 @@
-import styles from './Layout.module.css'
+import styles from './Main.module.css'
 import cn from 'classnames'
-import { ContainerView } from '../types/index'
-import Button from './Button'
+import { ContainerView } from '../../types'
+import Button from '../../components/common/Button'
 
 export const siteTitle = "Job Gatherer"
 

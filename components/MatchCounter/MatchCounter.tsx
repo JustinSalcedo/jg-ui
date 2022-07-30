@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import KwdItem from './KwdItem';
+import KwdItem from '../KwdItem';
 import styles from './MatchCounter.module.css';
 
 export default function MatchCounter({ skills, resps, resume }: {
