@@ -36,3 +36,5 @@ export interface IApplication {
     updatedAt?: Date
     __v?: number
 }
+
+export type { CustomEditor, CustomElement, CustomText } from './IEditor'

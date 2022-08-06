@@ -1,1 +1,1 @@
-export { default, siteTitle } from './Main'
+export { default } from './Main'

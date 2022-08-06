@@ -1,25 +1,85 @@
 .button {
-    border-radius: 1rem;
+    border-radius: .75rem;
     color: white;
 }
 
-.button:hover {
-    background-color: skyblue;
+.lg {
+    font-size: 1.5rem;
+    padding: .5rem 1.25rem;
 }
 
-.lg {
-    font-size: 2rem;
-    padding: .5rem 1rem;
+.md {
+    font-size: 1.25rem;
+    padding: .4rem 1rem;
+}
+
+.sm {
+    font-size: 1rem;
+    padding: .3rem 0.75rem;
 }
 
 .primary {
-    background-color: blue;
+    border-color: #3498db;
+    background-color: #3498db;
+    transition: all 150ms ease-in-out;
+}
+
+.primary:hover {
+    border-color: #1a7ec0;
+    background-color: #1a7ec0;
 }
 
 .secondary {
-    background-color: blueviolet;
+    border-color: blueviolet;
+    color: blueviolet;
+    transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
+}
+
+.secondary:hover {
+    box-shadow: 0 0 40px 40px blueviolet inset;
+    color: #fff;
 }
 
 .tertiary {
-    background-color: chocolate;
+    border-radius: 3rem;
+    border-color: rgb(180, 85, 18);
+    background-image: linear-gradient(to right,
+        rgba(180, 85, 18, 0.7),
+        rgba(180, 85, 18, 0.7) 5%, rgb(180, 85, 18) 5%, rgb(180, 85, 18) 10%,
+        rgba(180, 85, 18, 0.7) 10%,
+        rgba(180, 85, 18, 0.7) 15%, rgb(180, 85, 18) 15%, rgb(180, 85, 18) 20%,
+        rgba(180, 85, 18, 0.7) 20%,
+        rgba(180, 85, 18, 0.7) 25%, rgb(180, 85, 18) 25%, rgb(180, 85, 18) 30%,
+        rgba(180, 85, 18, 0.7) 30%,
+        rgba(180, 85, 18, 0.7) 35%, rgb(180, 85, 18) 35%, rgb(180, 85, 18) 40%,
+        rgba(180, 85, 18, 0.7) 40%,
+        rgba(180, 85, 18, 0.7) 45%, rgb(180, 85, 18) 45%, rgb(180, 85, 18) 50%,
+        rgba(180, 85, 18, 0.7) 50%,
+        rgba(180, 85, 18, 0.7) 55%, rgb(180, 85, 18) 55%, rgb(180, 85, 18) 60%,
+        rgba(180, 85, 18, 0.7) 60%,
+        rgba(180, 85, 18, 0.7) 65%, rgb(180, 85, 18) 65%, rgb(180, 85, 18) 70%,
+        rgba(180, 85, 18, 0.7) 70%,
+        rgba(180, 85, 18, 0.7) 75%, rgb(180, 85, 18) 75%, rgb(180, 85, 18) 80%,
+        rgba(180, 85, 18, 0.7) 80%,
+        rgba(180, 85, 18, 0.7) 85%, rgb(180, 85, 18) 85%, rgb(180, 85, 18) 90%,
+        rgba(180, 85, 18, 0.7) 90%,
+        rgba(180, 85, 18, 0.7) 95%, rgb(180, 85, 18) 95%, rgb(180, 85, 18) 100%
+    );
+    /* background-image: linear-gradient(to right,
+        rgba(180, 85, 18, 0.7),
+        rgba(180, 85, 18, 0.7) 5%, rgb(180, 85, 18) 5%, rgb(180, 85, 18) 10%,
+    ); */
+    background-position: 0% 0%;
+    background-size: 100%;
+    transition: background 300ms ease-in-out;
+}
+
+.tertiary:hover {
+    background-position: 100px;
+}
+
+.disabled {
+    cursor: default;
+    border-color: gray;
+    background-color: gray;
 }

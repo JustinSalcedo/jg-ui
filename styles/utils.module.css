@@ -1,3 +1,16 @@
 .mg-btm {
     margin-bottom: 1rem;
 }
+
+.heading1 {
+    font-size: 1.5rem;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}

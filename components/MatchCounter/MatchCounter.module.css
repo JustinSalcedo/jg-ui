@@ -12,5 +12,5 @@
     display: flex;
     flex-wrap: wrap;
     overflow-y: scroll;
-    max-height: 7rem;
+    max-height: calc(25vh - 2rem - 2rem);
 }

@@ -29,12 +29,20 @@
 
 .prompt {
     margin-bottom: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.prompt > input[type='text'] {
+    width: 80%;
+    margin-right: .5rem;
 }
 
 .list-area {
+    height: 100%;
     grid-area: list-area;
     display: grid;
-    grid-template-rows: 5fr 1fr;
+    grid-template-rows: 1fr 2rem;
     grid-template-areas:
         "open-d"
         "close-d";
@@ -57,5 +65,5 @@
     display: flex;
     flex-wrap: wrap;
     overflow-y: scroll;
-    max-height: 10rem;
+    max-height: calc(50vh - 2rem - 10rem);
 }

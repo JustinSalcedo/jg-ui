@@ -1,5 +1,6 @@
 import KwdItem from '../KwdItem';
 import styles from './MatchCounter.module.css';
+import utilStyles from '../../styles/utils.module.css'
 
 export default function MatchCounter({ skills, resps, resume }: {
     skills: string[], resps: string[], resume: string
@@ -19,7 +20,7 @@ export default function MatchCounter({ skills, resps, resume }: {
         <div className={styles.container}>
             <div className="">
                 <h4>Skills: {countMatches(skills)}/{skills.length}</h4>
-                <ul className={styles.list}>
+                <ul className={styles.list + ' ' + utilStyles['hide-scrollbar']}>
                     {skills.map((skill, index) => (
                         <KwdItem
                             key={index} keyword={skill}
@@ -30,7 +31,7 @@ export default function MatchCounter({ skills, resps, resume }: {
             </div>
             <div className="">
                 <h4>Responsibilities: {countMatches(resps)}/{resps.length}</h4>
-                <ul className={styles.list}>
+                <ul className={styles.list + ' ' + utilStyles['hide-scrollbar']}>
                     {resps.map((resp, index) => (
                         <KwdItem
                             key={index} keyword={resp}

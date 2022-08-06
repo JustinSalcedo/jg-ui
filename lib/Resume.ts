@@ -1,4 +1,5 @@
-import { IBasics, ICertificate, IEducationItem, IProject, ISkill, IWorkItem } from "../types/IResume"
+import { SAMPLE_RESUME } from "../constants/index"
+import IResume, { IBasics, ICertificate, IEducationItem, IProject, ISkill, IWorkItem } from "../types/IResume"
 
 export default class Resume {
     private defaultDate = "2000-01-01"
@@ -83,6 +84,7 @@ export default class Resume {
         "entity": "",
         "type": ""
     }
+    private sampleResume: IResume = SAMPLE_RESUME
 
     constructor(placeholder?: boolean, basics?: IBasics) {
         if (placeholder) {
@@ -162,5 +164,9 @@ export default class Resume {
             }
         })
         return populated
+    }
+
+    public getSampleResume() {
+        return this.sampleResume
     }
 }

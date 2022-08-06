@@ -3,11 +3,16 @@ html, body {
     margin: 0%;
     padding: 0%;
     font-size: 1rem;
-    background-color: lightblue;
+    background-color: #f6f6f6;
 }
 
 * {
     box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 ul {
@@ -19,6 +24,19 @@ ul {
 button {
     border: none;
     cursor: pointer;
+
+    border-radius: 1rem;
+    color: #fff;
+    line-height: 1;
+    font-family: 'Montserrat', sans-serif;
+    appearance: none;
+    background-color: transparent;
+    border: 2px solid blue;
+    border-radius: 0.6rem;
+    display: flex;
+    align-self: center;
+    font-weight: 700;
+    text-align: center;
 }
 
 textarea {

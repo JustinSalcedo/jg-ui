@@ -1,0 +1,18 @@
+.element {
+    margin: 0%;
+    line-height: 1.15;
+    font-size: 12pt;
+}
+
+.container {
+    padding: .5rem;
+    background-color: white;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.h1 {
+    margin: 0%;
+    font-weight: normal;
+    font-size: 16pt;
+}

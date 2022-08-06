@@ -1,4 +1,5 @@
 import styles from './TextView.module.css';
+import utilStyles from '../../styles/utils.module.css'
 
 export default function TextView({ content, input, skills, resps }: {
     content:string, input: string
@@ -28,7 +29,7 @@ export default function TextView({ content, input, skills, resps }: {
 
     return (
         <>
-            <div className={styles.view} dangerouslySetInnerHTML={{__html: highlightText()}}></div>
+            <div className={styles.view + ' ' + utilStyles['hide-scrollbar']} dangerouslySetInnerHTML={{__html: highlightText()}}></div>
         </>
     )
 }

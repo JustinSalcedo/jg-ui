@@ -5,6 +5,7 @@
     height: 100%;
     line-height: 1.5;
     overflow-y: scroll;
+    white-space: pre-wrap;
 }
 
 .view span {

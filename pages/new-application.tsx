@@ -2,7 +2,7 @@ import Head from "next/head";
 import { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from "react";
 import Form from "../components/common/Form";
 import KwdsForm from "../components/KwdsForm";
-import Layout, { siteTitle } from "../layout/Main";
+import Layout from "../layout/Main";
 import MatchCounter from "../components/MatchCounter";
 import Panel from "../components/common/Panel";
 import ResumePreview from "../components/ResumePreview";
@@ -17,6 +17,7 @@ import { addLists, createApplication, createResume, editApplication, editResume 
 import Button from "../components/common/Button";
 import Resume from "../lib/Resume";
 import Link from "next/link";
+import { SITE_TITLE } from "../constants/index";
 
 const stageValues: Stage[] = ['writeApplication', 'captureKeywords', 'writeResume', 'formatResume']
 const typeToKey = {
@@ -224,7 +225,7 @@ export default function NewApplication() {
             lastButton={<Button type="tertiary" clickHandler={() => handlePrint(printAction)} >Print</Button>}
         >
             <Head>
-                <title>{siteTitle}</title>
+                <title>{SITE_TITLE}</title>
             </Head>
 
             {stage === "writeApplication" && (
