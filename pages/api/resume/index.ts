@@ -6,8 +6,8 @@ export const API_URL = "http://localhost:3031/api/resume"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         if (req.method === 'POST') {
-            const { applicationId, resume: inputResume } = req.body
-            const newResume = await createResume(applicationId, inputResume)
+            const { userId, applicationId, resume: inputResume } = req.body
+            const newResume = await createResume(userId, applicationId, inputResume)
             res.status(201).json(newResume)
         }
     } catch (error) {
@@ -16,14 +16,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 }
 
-async function createResume(applicationId: string, inputResume: IResume): Promise<IResume> {
+async function createResume(userId: string, applicationId: string, inputResume: IResume): Promise<IResume> {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ applicationId, resume: inputResume})
+            body: JSON.stringify({ userId, applicationId, resume: inputResume})
         })
         const resume = await response.json()
         if (response.status !== 201) {

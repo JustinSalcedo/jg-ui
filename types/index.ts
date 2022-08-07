@@ -38,3 +38,15 @@ export interface IApplication {
 }
 
 export type { CustomEditor, CustomElement, CustomText } from './IEditor'
+
+export interface IUser {
+    _id?: string
+    sub: string
+    name: string
+    email: string
+    email_verified: boolean
+    masterResume?: string
+    applications?: string[]
+    createdAt?: Date
+    updatedAt?: Date
+}

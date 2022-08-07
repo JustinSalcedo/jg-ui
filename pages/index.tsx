@@ -14,24 +14,27 @@ import DraftEditor from "../components/DraftEditor"
 import Resume from "../lib/Resume"
 import { Descendant } from "slate"
 import { DEFAULT_DRAFT } from "../constants"
+import { useAuth0, User } from "@auth0/auth0-react"
 
 const STAGES = ['Job Description', 'Capture keywords', 'Write your resume']
 
 export default function Home() {
-    const [user, setUser] = useState(null)
+    const { user, isAuthenticated, isLoading } = useAuth0()
+    // const [user, setUser] = useState(null)
 
     function isAuth() {
-        return !!user
+        return isAuthenticated
     }
 
     if (!isAuth()) return (<GuestHome/>)
+    else return (<UserHome user={user} />)
 }
 
 function GuestHome() {
     const application = new Application()
     const resume = new Resume()
 
-    // const TextAreaRef = useRef
+    const { loginWithRedirect } = useAuth0()
 
     const loadedResume = useMemo(() => resume.getSampleResume(), [])
 
@@ -174,9 +177,15 @@ function GuestHome() {
         application.saveStage(0)
     }
 
+    // User login
+
+    function handleLogin() {
+        loginWithRedirect()
+    }
+
     return (
         <Layout
-            containerView={containerView} headerButtons={[ <Button type="disabled" size="sm" key={0}>Sign In</Button> ]}
+            containerView={containerView} headerButtons={[ <Button type="primary" size="sm" key={0} clickHandler={() => handleLogin()}>Sign In</Button> ]}
             navigation={determineStagePosition()} navigateStages={navigateStages.bind(this)} lockedStage={lockedStage}
             stages={STAGES} activeStage={stageNumber} lastButton={ <Button type="tertiary" size="md" clickHandler={() => handleReset()}>Reset</Button> }>
 
@@ -226,4 +235,14 @@ function draftToString(draft: Descendant[]) {
         .map(({ children }: CustomElement) => children
             .map(({ text }) => text.toLocaleLowerCase()).join(''))
         .join('\n')
+}
+
+function UserHome({ user }: { user: User }) {
+    
+    
+    return (
+        <div>
+            <p>{user.sub}</p>
+        </div>
+    )
 }

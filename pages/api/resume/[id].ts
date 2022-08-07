@@ -6,12 +6,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         const { id } = req.query as { id: string }
         if (req.method === 'GET') {
-            const resume = await getResume(id)
+            const { userid: userId, applicationid: applicationId } = req.headers
+            const resume = await getResume(userId as string, applicationId as string, id)
             res.status(200).json(resume)
         }
         if (req.method === 'PATCH') {
-            const { resume: inputResume } = req.body
-            const updatedResume = await editResume(id, inputResume)
+            const { userId, applicationId, resume: inputResume } = req.body
+            const updatedResume = await editResume(userId as string, applicationId as string, id, inputResume)
             res.status(200).json(updatedResume)
         }
     } catch (error) {
@@ -20,9 +21,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 }
 
-async function getResume(id: string): Promise<IResume> {
+async function getResume(userId: string, applicationId: string, id: string): Promise<IResume> {
     try {
-        const response = await fetch(`${API_URL}/${id}`)
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                userid: userId,
+                applicationid: applicationId
+            },
+        })
         const resume = await response.json()
         if (response.status !== 200) {
             const { message }: Error = resume.errors
@@ -34,14 +42,14 @@ async function getResume(id: string): Promise<IResume> {
     }
 }
 
-async function editResume(id: string, inputResume: IResume): Promise<IResume> {
+async function editResume(userId: string, applicationId: string, id: string, inputResume: IResume): Promise<IResume> {
     try {
         const response = await fetch(`${API_URL}/${id}`, {
             method: "PATCH",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ resume: inputResume })
+            body: JSON.stringify({ userId, applicationId, resume: inputResume })
         })
         const resume = await response.json()
         if (response.status !== 200) {
