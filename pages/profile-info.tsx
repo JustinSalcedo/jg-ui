@@ -2,14 +2,14 @@ import Head from "next/head";
 import { ChangeEvent, useContext } from "react";
 import Layout from "../layout/Main";
 import Panel from "../components/common/Panel";
-import { UserBasicsContext } from "../contexts/index";
+import { UserContext } from "../contexts/index";
 import Input from "../components/common/Input";
 import { useRouter } from "next/router";
 import { SITE_TITLE } from "../constants/index";
 
 export default function ProfileInfo() {
     const router = useRouter()
-    const { userBasics, handleUserBasics } = useContext(UserBasicsContext)
+    const { userBasics, handleUserBasics } = useContext(UserContext)
     function handleBasics(e: ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target
         handleUserBasics({

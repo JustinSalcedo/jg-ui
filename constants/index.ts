@@ -1,10 +1,11 @@
 import { Descendant } from "slate"
+import IResume from "../types/IResume"
 
 export const SITE_TITLE = "Job Gatherer"
 
 export const DEFAULT_DRAFT: Descendant[] = [{ type: 'paragraph', children: [{ text: '' }] }]
 
-export const SAMPLE_RESUME = {
+export const SAMPLE_RESUME: IResume = {
     "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
     "basics": {
         "name": "Your Name",
@@ -19,7 +20,7 @@ export const SAMPLE_RESUME = {
         "postalCode": "12345",
         "city": "Your City",
         "countryCode": "US",
-        "region": "Province or State"
+        "region": "Province/State"
         },
         "profiles": [
             {
@@ -61,6 +62,14 @@ export const SAMPLE_RESUME = {
             "courses": [
                 "Credit or non-credit courses"
             ]
+        }
+    ],
+    "certificates": [
+        {
+            "name": "Certificate",
+            "issuer": "Issuer organization",
+            "date": "2000-03-05",
+            "url": "https://certificate-url.com"
         }
     ],
     "skills": [

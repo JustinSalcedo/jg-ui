@@ -4,15 +4,19 @@ import Client from "../../../api/Client";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         const client = new Client('server')
-        const { id } = req.query as { id: string }
+        if (req.method === 'POST') {
+            const { userId, resume: inputResume } = req.body
+            const newResume = await client.createMasterResume(userId, inputResume)
+            res.status(201).json(newResume)
+        }
         if (req.method === 'GET') {
-            const { userid: userId, applicationid: applicationId } = req.headers
-            const resume = await client.getResume(userId as string, applicationId as string, id)
+            const { userid: userId } = req.headers
+            const resume = await client.getMasterResume(userId as string)
             res.status(200).json(resume)
         }
         if (req.method === 'PATCH') {
-            const { userId, applicationId, resume: inputResume } = req.body
-            const updatedResume = await client.editResume(userId as string, applicationId as string, id, inputResume)
+            const { userId, resume: inputResume } = req.body
+            const updatedResume = await client.editMasterResume(userId, inputResume)
             res.status(200).json(updatedResume)
         }
     } catch (error) {

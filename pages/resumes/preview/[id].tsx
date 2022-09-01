@@ -2,9 +2,11 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useEffect, useState } from "react"
 import NavyBlueByDv from "../../../components/resume-layouts/NavyBlueByDv"
 import IResume from "../../../types/IResume"
-import { getResume as getFreshResume } from "../../../api/client"
+import Client from "../../../api/Client"
 
 const API_URL = "http://localhost:3031/api/resume"
+
+const client = new Client('router')
 
 export async function getServerSideProps({ params, query }: GetServerSidePropsContext) {
     const { id } = params
@@ -31,7 +33,7 @@ export default function RenderResume({ resume, scale, page, skillview }: { resum
 
     useEffect(() => {
         const interval = setInterval(() => {
-            getFreshResume(freshResume._id)
+            client.getResume(freshResume._id)
                 .then(resume => setFreshResume(resume))
         }, 5000)
 

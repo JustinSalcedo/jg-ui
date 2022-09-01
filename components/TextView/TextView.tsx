@@ -2,7 +2,7 @@ import styles from './TextView.module.css';
 import utilStyles from '../../styles/utils.module.css'
 
 export default function TextView({ content, input, skills, resps }: {
-    content:string, input: string
+    content:string, input?: string
     skills: string[], resps: string[]
 }) {
     function highlightText () {

@@ -1,0 +1,36 @@
+.footer {
+    display: flex;
+    flex-direction: row;
+    margin: 0%;
+    font-size: .75rem;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    background-color: hsl(0, 0%, 10%);
+    color:hsl(0, 0%, 90%);
+    position: absolute;
+    bottom: 0%;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0%;
+    font-size: .75rem;
+}
+
+.author-links a:nth-child(2n - 1) {
+    border-left: 1px solid hsl(0, 0%, 90%);
+    border-right: 1px solid hsl(0, 0%, 90%);
+}
+
+.footer .author-links > * {
+    padding: 0% .75rem;
+}
+
+.footer p > *:not(.author-url) {
+    padding: 0% .75rem;
+}
+
+.footer img {
+    height: .75rem;
+}

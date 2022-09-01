@@ -1,27 +1,21 @@
-import Head from "next/head"
-import Link from "next/link"
-import Button from "../components/common/Button"
-import Layout from "../layout/Main"
-import { SITE_TITLE } from "../constants"
+import { useContext, useEffect, useState } from "react";
+import Client from "../api/Client";
+import { UserContext } from "../contexts/index";
+import Dashboard from "../layout/Dashboard/Dashboard";
+import { IApplication } from "../types/index";
 
-export default function Home() {
+const client = new Client('router')
+
+export default function UserDashboard() {
+    const { userRecord } = useContext(UserContext)
+
+    const [applications, setApplications] = useState([] as IApplication[])
+
+    useEffect(() => {
+        client.getAllApplications(userRecord._id).then(applications => setApplications(applications))
+    }, [])
+
     return (
-        <Layout containerView="home">
-            <Head>
-                <title>{SITE_TITLE}</title>
-            </Head>
-
-            <Button type="secondary">Past applications</Button>
-            <Link href="/new-application">
-                <a>
-                    <Button type="primary">New application</Button>
-                </a>
-            </Link>
-            <Link href="/profile-info">
-                <a>
-                    <Button type="tertiary">Profile info</Button>
-                </a>
-            </Link>
-        </Layout>
+        <Dashboard applications={applications} />
     )
 }

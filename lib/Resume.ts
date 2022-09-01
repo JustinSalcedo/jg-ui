@@ -86,15 +86,20 @@ export default class Resume {
     }
     private sampleResume: IResume = SAMPLE_RESUME
 
-    constructor(placeholder?: boolean, basics?: IBasics) {
-        if (placeholder) {
-            this.skill = this.setPlaceholder(this.skill)
-            this.education = this.setPlaceholder(this.education)
-            this.certificate = this.setPlaceholder(this.certificate)
-            this.work = this.setPlaceholder(this.work)
-            this.project = this.setPlaceholder(this.project)
+    constructor(options?: { placeholder?: boolean, basics?: IBasics }) {
+        if (options) {
+            const { placeholder, basics } = options
+            if (placeholder) {
+                this.skill = this.setPlaceholder(this.skill)
+                this.education = this.setPlaceholder(this.education)
+                this.certificate = this.setPlaceholder(this.certificate)
+                this.work = this.setPlaceholder(this.work)
+                this.project = this.setPlaceholder(this.project)
+            }
+            this.basics = basics || this.defaultBasics
+        } else {
+            this.basics = this.defaultBasics
         }
-        this.basics = basics || this.defaultBasics
     }
 
     public getBasics() {

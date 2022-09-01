@@ -1,11 +1,11 @@
 import Head from "next/head"
 import Button from "../components/common/Button"
-import Layout from "../layout/Main"
+import Main from "../layout/Main"
 import { SITE_TITLE } from "../constants"
 import Panel from "../components/common/Panel/Panel"
 import Textarea from "../components/Textarea"
 import KwdsForm from "../components/KwdsForm/KwdsForm"
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo, useState } from "react"
+import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react"
 import { ContainerView, CustomElement } from "../types/index"
 import TextView from "../components/TextView/TextView"
 import MatchCounter from "../components/MatchCounter/MatchCounter"
@@ -14,32 +14,27 @@ import DraftEditor from "../components/DraftEditor"
 import Resume from "../lib/Resume"
 import { Descendant } from "slate"
 import { DEFAULT_DRAFT } from "../constants"
-import { useAuth0, User } from "@auth0/auth0-react"
+import { UserContext } from "../contexts/index"
+import Menu from "../layout/Menu/Menu"
+import { draftToString } from "../lib/resumeProcessor"
 
 const STAGES = ['Job Description', 'Capture keywords', 'Write your resume']
 
 export default function Home() {
-    const { user, isAuthenticated, isLoading } = useAuth0()
-    // const [user, setUser] = useState(null)
-
-    function isAuth() {
-        return isAuthenticated
-    }
-
-    if (!isAuth()) return (<GuestHome/>)
-    else return (<UserHome user={user} />)
+    const { isAuth, isLocallyAuth } = useContext(UserContext)
+    if (!(isAuth || isLocallyAuth)) return (<GuestHome />)
+    else return (<UserHome />)
 }
 
 function GuestHome() {
+    const { login } = useContext(UserContext)
     const application = new Application()
     const resume = new Resume()
-
-    const { loginWithRedirect } = useAuth0()
 
     const loadedResume = useMemo(() => resume.getSampleResume(), [])
 
     const [stageNumber, setStageNumber] = useState(0)
-    const [containerView, setContainerView] = useState('threePanel') as [ContainerView, Dispatch<SetStateAction<ContainerView>>]
+    const [containerView, setContainerView] = useState('threePanel' as ContainerView)
     const [loaded, setLoaded] = useState(false)
     const [description, setDescription] = useState('')
     const [inputTerm, setInputTerm] = useState('')
@@ -58,7 +53,7 @@ function GuestHome() {
 
     function loadData() {
         if (!description) {
-            setDescription(application.loadJobDescription() as string)
+            setDescription(application.loadJobDescription())
         }
         if (!skills.length && !resps.length) {
             const { skills, resps } = application.loadKeywords()
@@ -88,32 +83,28 @@ function GuestHome() {
 
     function navigateStages(way: 1 | -1) {
         const newStage = stageNumber + way
-        if (way === 1) processData(newStage as 1 | 2)
+        // if (way === 1) processData(newStage as 1 | 2)
         defineContainerView(newStage)
         setStageNumber(newStage)
         application.saveStage(newStage)
     }
 
-    // function focusPanel() {
-
+    // function processData(nextStage: 1 | 2) {
+    //     try {
+    //         if (nextStage === 1) {
+    //             if (description) {
+    //                 application.saveJobDescription(description)
+    //             }
+    //         }
+    //         if (nextStage === 2) {
+    //             if (skills.length || resps.length) {
+    //                 application.saveKeywords({ skills, resps })
+    //             }
+    //         }
+    //     } catch (error) {
+    //         alert(error)
+    //     }
     // }
-
-    function processData(nextStage: 1 | 2) {
-        try {
-            if (nextStage === 1) {
-                if (description) {
-                    application.saveJobDescription(description)
-                }
-            }
-            if (nextStage === 2) {
-                if (skills.length || resps.length) {
-                    application.saveKeywords({ skills, resps })
-                }
-            }
-        } catch (error) {
-            alert(error)
-        }
-    }
 
     function validateStage() {
         if (stageNumber === 0 && description
@@ -135,25 +126,38 @@ function GuestHome() {
     function handleDescription(e: ChangeEvent<HTMLTextAreaElement>) {
         const { value } = e.target
         setDescription(value)
+        application.saveJobDescription(value)
     }
 
     // Capture keywords stage
 
     function addKeyword(key: 'skills' | 'resps', value: string) {
         if (key === 'skills') {
-            setSkills(skills => ([...skills, value]))
+            setSkills(skills => {
+                application.saveKeywords({ skills, resps })
+                return [...skills, value]
+            })
         }
         if (key === 'resps') {
-            setResps(resps => ([...resps, value]))
+            setResps(resps => {
+                application.saveKeywords({ skills, resps })
+                return [...resps, value]
+            })
         }
     }
 
     function deleteKeyword(key: 'skills' | 'resps', id: string | number) {
         if (key === 'skills') {
-            setSkills(skills => skills.filter((_, index) => index !== id))
+            setSkills(skills => {
+                application.saveKeywords({ skills, resps })
+                return skills.filter((_, index) => index !== id)
+            })
         }
         if (key === 'resps') {
-            setResps(resps => resps.filter((_, index) => index !== id))
+            setResps(resps => {
+                application.saveKeywords({ skills, resps })
+                return resps.filter((_, index) => index !== id)
+            })
         }
     }
 
@@ -161,6 +165,7 @@ function GuestHome() {
 
     function handleDraft(draft: Descendant[]) {
         setDraft(draft)
+        application.saveDraft(draft)
     }
 
     // Reset guest data
@@ -180,14 +185,15 @@ function GuestHome() {
     // User login
 
     function handleLogin() {
-        loginWithRedirect()
+        login()
     }
 
     return (
-        <Layout
-            containerView={containerView} headerButtons={[ <Button type="primary" size="sm" key={0} clickHandler={() => handleLogin()}>Sign In</Button> ]}
-            navigation={determineStagePosition()} navigateStages={navigateStages.bind(this)} lockedStage={lockedStage}
-            stages={STAGES} activeStage={stageNumber} lastButton={ <Button type="tertiary" size="md" clickHandler={() => handleReset()}>Reset</Button> }>
+        <Main
+            containerView={containerView} headerButtons={[ <Button type="primary" size="sm" clickHandler={() => handleLogin()}>Sign In</Button> ]}
+            position={determineStagePosition()} navigateStages={navigateStages.bind(this)} lockedStage={lockedStage}
+            stages={STAGES} activeStage={stageNumber} lastButton={ <Button type="tertiary" size="md" clickHandler={() => handleReset()}>Reset</Button> }
+        >
 
             <Head>
                 <title>{SITE_TITLE}</title>
@@ -221,28 +227,20 @@ function GuestHome() {
                         <MatchCounter skills={skills} resps={resps} resume={draftToString(draft)} />
                     </Panel>
                     <Panel place={3}>
-                        {/* <DraftEditor text={draft} handler={handleDraft.bind(this)} /> */}
                         <DraftEditor resume={guestResume} draft={draft} handleDraft={handleDraft} />
                     </Panel>
                 </>
             ) : ''}
-        </Layout>
+        </Main>
     )
 }
 
-function draftToString(draft: Descendant[]) {
-    return draft
-        .map(({ children }: CustomElement) => children
-            .map(({ text }) => text.toLocaleLowerCase()).join(''))
-        .join('\n')
-}
+function UserHome() {
+    const { userRecord, isLoading } = useContext(UserContext)
 
-function UserHome({ user }: { user: User }) {
-    
-    
     return (
-        <div>
-            <p>{user.sub}</p>
-        </div>
+        <>
+            {userRecord ? (<Menu />) : (isLoading ? 'loading...' : 'Error')}
+        </>
     )
 }

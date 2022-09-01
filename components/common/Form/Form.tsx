@@ -1,22 +1,25 @@
-import { ChangeEventHandler } from "react"
-import { IApplication } from "../../../types"
+import { ChangeEventHandler, FocusEventHandler, ReactNode } from "react"
+import { IApplication, IElement } from "../../../types"
 import Input from "../Input"
 import styles from './Form.module.css';
-import IResume from "../../../types/IResume";
+import IResume, { IBasics } from "../../../types/IResume";
+import utilStyles from '../../../styles/utils.module.css'
 
-export default function Form({ formData, formHandler, action }: {
+export default function Form({ formData, formHandler, action, additionalInputs, registerFocus }: {
     /* Form only accepts resumes and applications,
         which are the only API entry points available
         for POST */
-    formData: IResume | IApplication
-    formHandler: ChangeEventHandler
-    action: string
+    formData: IResume | Partial<IApplication> | IElement | IBasics
+    formHandler?: ChangeEventHandler<HTMLInputElement>
+    action?: string, additionalInputs?: ReactNode
+    registerFocus?: (isFocused: boolean) => void
 }) {
     return (
-        <form className={styles.form} action={action} method="POST">
-            {Object.entries(formData).map(([key, value]) => (
+        <form onFocus={registerFocus && (() => registerFocus(true))} onBlur={registerFocus && (() => registerFocus(false))} className={styles.form + ' ' + utilStyles['hide-scrollbar']} action={action || ''} method="POST">
+            {formData ? Object.entries(formData).map(([key, value]) => (
                 <Input key={key} name={key} value={value as string} handler={formHandler} />
-            ))}
+            )) : ''}
+            {additionalInputs || ''}
         </form>
     )
 }

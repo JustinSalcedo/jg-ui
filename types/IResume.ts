@@ -5,6 +5,42 @@
  */
 export type Iso8601 = string;
 
+export interface ILocation {
+  /**
+   * To add multiple address lines, use
+   * . For example, 1234 Glücklichkeit Straße
+   * Hinterhaus 5. Etage li.
+   */
+  address?: string;
+  postalCode?: string;
+  city?: string;
+  /**
+   * code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN
+   */
+  countryCode?: string;
+  /**
+   * The general region where you live. Can be a US state, or a province, for instance.
+   */
+  region?: string;
+  [k: string]: unknown;
+}
+
+export interface IProfile {
+  /**
+   * e.g. Facebook or Twitter
+   */
+  network?: string;
+  /**
+   * e.g. neutralthoughts
+   */
+  username?: string;
+  /**
+   * e.g. http://twitter.example.com/neutralthoughts
+   */
+  url?: string;
+  [k: string]: unknown;
+}
+
 export interface IBasics {
   name?: string;
   /**
@@ -31,43 +67,11 @@ export interface IBasics {
    * Write a short 2-3 sentence biography about yourself
    */
   summary?: string;
-  location?: {
-    /**
-     * To add multiple address lines, use
-     * . For example, 1234 Glücklichkeit Straße
-     * Hinterhaus 5. Etage li.
-     */
-    address?: string;
-    postalCode?: string;
-    city?: string;
-    /**
-     * code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN
-     */
-    countryCode?: string;
-    /**
-     * The general region where you live. Can be a US state, or a province, for instance.
-     */
-    region?: string;
-    [k: string]: unknown;
-  };
+  location?: ILocation
   /**
    * Specify any number of social networks that you participate in
    */
-  profiles?: {
-    /**
-     * e.g. Facebook or Twitter
-     */
-    network?: string;
-    /**
-     * e.g. neutralthoughts
-     */
-    username?: string;
-    /**
-     * e.g. http://twitter.example.com/neutralthoughts
-     */
-    url?: string;
-    [k: string]: unknown;
-  }[];
+  profiles?: IProfile[];
   [k: string]: unknown;
 }
 

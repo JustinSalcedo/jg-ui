@@ -3,18 +3,37 @@ import RichTextEditor from "./common/RichTextEditor/RichTextEditor";
 import IResume from "../types/IResume";
 import { CustomElement } from "../types/IEditor";
 import { dateToFullMonth, dateToMonthDay } from "../lib/formatDate";
-import { useEffect } from "react";
+import { UIEvent, useEffect, useState } from "react";
+import { DEFAULT_DRAFT } from "../constants/index";
 
-export default function DraftEditor({ resume, draft, handleDraft }: { resume: IResume, draft: Descendant[], handleDraft: (draft: Descendant[]) => void }) {
+export default function DraftEditor({ resume, draft, handleDraft, readOnly }: {
+    resume?: IResume, draft: Descendant[], handleDraft: (draft: Descendant[]) => void, readOnly?: boolean
+}) {
+    const [scrollTop, setScrollTop] = useState(0)
+
     useEffect(() => {
-        if (!draft.length) handleDraft(resumeToDraft(resume))
-    }, [])
+        loadDraft()
+    }, [resume, draft.length])
     
+    function loadDraft() {
+        if (!draft.length) {
+            if (resume) handleDraft(resumeToDraft(resume))
+            else handleDraft(DEFAULT_DRAFT)
+        }
+    }
+
+    function handleScroll(e: UIEvent<HTMLDivElement>) {
+        const { scrollTop } = e.currentTarget
+        setScrollTop(scrollTop)
+    }
 
     return (
         <>
             {draft.length ? (
-                <RichTextEditor content={draft} handler={handleDraft} />
+                <RichTextEditor
+                    content={draft} handler={handleDraft} readOnly={readOnly}
+                    scrollTop={scrollTop} handleScroll={handleScroll}
+                 />
             ): ''}
         </>
     )
@@ -38,7 +57,7 @@ function resumeToDraft({ basics, skills, education, certificates, work, projects
         { text: `${phone} | ${email} | ${location.address ? location.address + ', ' : ''}${location.city}, ${location.region} ${location.postalCode || ''}` }
     ] }
     const linkedin: CustomElement = { ...cEl, children: [
-        { text: 'LinkedIn: ' + (profiles[0] ? profiles[0].url : '') }
+        { text: 'LinkedIn: ' + ((profiles && profiles[0]) ? profiles[0].url : '') }
     ] }
     const portfolioUrl: CustomElement = { ...cEl, children: [
         { text: 'Portfolio: ' + url }
@@ -60,8 +79,8 @@ function resumeToDraft({ basics, skills, education, certificates, work, projects
         draftNodes.push({ ...cEl, children: [{ text: skillStrings.join('; ') }] })
     }
     if (education) {
-        draftNodes.push({ ...cEl, children: [{ text: 'Educations', bold: true }], align: 'center' })
-        education.forEach((edu, idx) => {
+        draftNodes.push({ ...cEl, children: [{ text: 'Education', bold: true }], align: 'center' })
+        education.filter(edu => edu.studyType !== 'Coursework').forEach((edu, idx) => {
             const eduTitle: CustomElement = { ...cEl, children: [
                 { text: '\t' + edu.studyType + ', ' },
                 { text: edu.area, underline: true },
@@ -70,18 +89,19 @@ function resumeToDraft({ basics, skills, education, certificates, work, projects
             const eduDetails: CustomElement = { ...cEl, children: [
                 { text: `${edu.startDate ? dateToFullMonth(edu.startDate) + ' - ' : ''}${edu.endDate ? dateToFullMonth(edu.endDate) : 'In Progress'} | ` },
                 { text: edu.institution, underline: true },
-                { text: edu.location ? `(${edu.location})` : '' }
+                { text: edu.location ? ` (${edu.location})` : '' }
             ] }
-            const eduCourses: CustomElement = { ...cEl, children: [
+            const eduCourses: CustomElement = edu.courses ? { ...cEl, children: [
                 { text: 'Relevant Coursework: ' + edu.courses.join('; ') }
-            ] }
-            draftNodes.push(eduTitle, eduDetails, eduCourses)
+            ] } : null
+            draftNodes.push(eduTitle, eduDetails)
+            if (eduCourses) draftNodes.push(eduCourses)
             if (idx !== education.length - 1) {
                 draftNodes.push({ ...cEl, children: [{ text: '' }] })
             }
         })
     }
-    if (certificates || coursework.length) {
+    if (certificates && certificates.length || coursework.length) {
         draftNodes.push({ ...cEl, children: [{ text: 'Certificates', bold: true }], align: 'center' })
         certificates.forEach(cert => {
             const certTitle: CustomElement = { ...cEl, children: [
@@ -101,7 +121,7 @@ function resumeToDraft({ basics, skills, education, certificates, work, projects
                 { text: edu.endDate ? ', ' + dateToFullMonth(edu.endDate) : '' }
             ] }
             const courseCourses: CustomElement = { ...cEl, children: [
-                { text: 'Coursework: ' + edu.courses.join(', ') }
+                { text: 'Coursework: ' + edu.courses.join('; ') }
             ] }
             draftNodes.push(courseTitle, courseCourses)
             if (idx !== coursework.length - 1) {
@@ -115,7 +135,7 @@ function resumeToDraft({ basics, skills, education, certificates, work, projects
             const workTitle: CustomElement = { ...cEl, children: [
                 { text: '\t' }, { text: w.position, underline: true },
                 { text: ' at ' + w.name + ' | ' + (w.startDate ? dateToMonthDay(w.startDate)
-                    + ' ' : '') + '- ' + (w.endDate ? dateToMonthDay(w.endDate) : 'Current')
+                    + ' - ' : '') + (w.endDate ? dateToMonthDay(w.endDate) : 'Current')
                     + (w.location ? ` (${w.location})` : '') }
             ] }
             const workHighlights: CustomElement[] = w.highlights.map(highlight => ({
@@ -133,7 +153,7 @@ function resumeToDraft({ basics, skills, education, certificates, work, projects
         projects.forEach((proj, idx) => {
             const projTitle: CustomElement = { ...cEl, children: [
                 { text: '\t' }, { text: proj.name, underline: true },
-                { text: ' ' + `(${proj.entity})` + ' | '
+                { text: ` (${proj.type})` + (proj.startDate && proj.endDate ? ' | ' : '')
                     + (proj.startDate ? dateToMonthDay(proj.startDate) + ' ' : '')
                     + (proj.endDate ? '- ' + dateToMonthDay(proj.endDate) : '' ) }
             ] }

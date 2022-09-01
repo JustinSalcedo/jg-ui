@@ -1,4 +1,4 @@
-import { KeyboardEvent, useCallback, useMemo, useState } from "react";
+import { KeyboardEvent, UIEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createEditor, Descendant } from "slate";
 import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { DEFAULT_DRAFT } from "../../../constants/index";
@@ -15,11 +15,21 @@ declare module 'slate' {
     }
 }
 
-export default function RichTextEditor({ content, handler }: { content: Descendant[], handler: (content: Descendant[]) => void }) {
+export default function RichTextEditor({ content, handler, readOnly, scrollTop, handleScroll }: {
+    content: Descendant[], handler: (content: Descendant[]) => void
+    readOnly?: boolean, scrollTop?: number, handleScroll?: (e: UIEvent<HTMLDivElement>) => void
+}) {
     const initialValue = useMemo(() => content || DEFAULT_DRAFT, [])
     const [editor] = useState(() => withReact(createEditor()))
 
+    const ref = useRef(null as HTMLDivElement)
+
+    useEffect(() => {
+        if (scrollTop) ref.current.scrollTo({ top: scrollTop })
+    }, [content.length])
+
     function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+        if (readOnly && !(e.ctrlKey && e.key === 'c')) return e.preventDefault()
         if (e.ctrlKey) {
             switch (e.key) {
                 case '`':
@@ -62,6 +72,7 @@ export default function RichTextEditor({ content, handler }: { content: Descenda
         if (isAstChange) {
             handler(value)
         }
+        return false
     }
 
     const renderElement = useCallback((props: RenderElementProps) => {
@@ -81,7 +92,7 @@ export default function RichTextEditor({ content, handler }: { content: Descenda
 
     return (
         <Slate editor={editor} value={initialValue} onChange={onChange} >
-            <div className={styles.container + ' ' + utilStyles['hide-scrollbar']}>
+            <div ref={ref} onScroll={handleScroll} className={styles.container + ' ' + utilStyles['hide-scrollbar']}>
                 <Editable onKeyDown={onKeyDown} renderElement={renderElement} renderLeaf={renderLeaf} />
             </div>
         </Slate>

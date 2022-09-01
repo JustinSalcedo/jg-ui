@@ -1,0 +1,36 @@
+.screen {
+    padding: 3vh 20px;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 4rem 60vh;
+    row-gap: 2rem;
+    grid-template-areas:
+        'header'
+        'container';
+}
+
+.container {
+    grid-area: container;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: auto;
+}
+
+.buttons {
+    width: 480px;
+    margin: auto;
+    margin-top: 4rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.subheading {
+    font-weight: normal;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 1rem;
+    color: #2e2d2f;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif;
+}

@@ -1,0 +1,68 @@
+.gap {
+    width: 100%;
+    height: 4px;
+    margin: .25rem 0;
+    transition: all 150ms ease-in-out;
+    font-size: 0;
+    background-color: #fff;
+}
+
+.active {
+    height: 12px;
+    margin: 0;
+    background-color: #ba82ee;
+}
+
+.active ~ hr {
+    display: none;
+}
+
+.item {
+    margin-bottom: 2px;
+    /* background-color: #efe5f8; */
+}
+
+.collapse summary {
+    /* height: 1rem; */
+    direction: rtl;
+    background-color: inherit;
+    transition: all 150ms ease-in-out;
+    cursor: grab;
+}
+
+.collapse summary:hover {
+    background-color: rgb(180, 238, 94);
+}
+
+.collapse summary:hover::marker {
+    color: green;
+    transition: all 150ms ease-in-out;
+}
+
+.tag {
+    display: inline-block;
+    direction: ltr;
+    text-align: start;
+    width: calc(100% - 1rem);
+    margin-left: -1rem;
+    padding-left: 1rem;
+    color: #aaa;
+    transition: all 150ms ease-in-out;
+    font-weight: bold;
+    /* height: 1rem;
+    overflow: hidden; */
+}
+
+.collapse summary:hover .tag {
+    color: green;
+}
+
+.collapse[open] summary {
+    height: .5rem;
+    margin-top: -.5rem;
+    cursor: pointer;
+}
+
+.collapse[open] .tag {
+    display: none;
+}

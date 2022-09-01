@@ -1,302 +1,290 @@
-import Head from "next/head";
-import { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from "react";
-import Form from "../components/common/Form";
-import KwdsForm from "../components/KwdsForm";
-import Layout from "../layout/Main";
-import MatchCounter from "../components/MatchCounter";
-import Panel from "../components/common/Panel";
-import ResumePreview from "../components/ResumePreview";
-import DraftTxtArea from "../components/DraftTxtArea";
-import Textarea from "../components/Textarea";
-import TextView from "../components/TextView";
-import { UserBasicsContext } from "../contexts/index";
-import { resumeToText, textToResume } from "../lib/resumeProcessor";
-import { IApplication, ContainerView, Stage, IElementType, IElement } from "../types";
-import IResume from "../types/IResume";
-import { addLists, createApplication, createResume, editApplication, editResume } from "../api/client";
-import Button from "../components/common/Button";
-import Resume from "../lib/Resume";
-import Link from "next/link";
-import { SITE_TITLE } from "../constants/index";
+import Head from "next/head"
+import Link from "next/link"
+import { ChangeEvent, useContext, useEffect, useState } from "react"
+import { Descendant } from "slate"
+import Application from "../api/Application"
+import Button from "../components/common/Button"
+import Form from "../components/common/Form/Form"
+import Panel from "../components/common/Panel"
+import DraftEditor from "../components/DraftEditor"
+import KwdsForm from "../components/KwdsForm"
+import MatchCounter from "../components/MatchCounter"
+import Textarea from "../components/Textarea"
+import TextView from "../components/TextView"
+import { SITE_TITLE } from "../constants/index"
+import { UserContext } from "../contexts/index"
+import Main from "../layout/Main"
+import { draftToResume, draftToString } from "../lib/resumeProcessor"
+import { ContainerView, CustomElement, IApplication } from "../types/index"
+import IResume from "../types/IResume"
 
-const stageValues: Stage[] = ['writeApplication', 'captureKeywords', 'writeResume', 'formatResume']
-const typeToKey = {
-    skill: "skills",
-    education: "education",
-    cert: "certificates",
-    work: "work",
-    project: "projects"
-}
+const STAGES = ['Job Description', 'Capture keywords', 'Write your resume']
 
 export default function NewApplication() {
-    const { userBasics } = useContext(UserBasicsContext)
+    const { userRecord, isLocallyAuth, logout } = useContext(UserContext)
+    const application = new Application(true)
 
-    const [jobDescription, setJobDescription] = useState('')
-    const [containerView, setContainerView] = useState('twoPanel') as [ContainerView, Dispatch<SetStateAction<ContainerView>>]
-    const [stage, setStage] = useState('writeApplication') as [Stage, Dispatch<SetStateAction<Stage>>]
-    const [applicationMetadata, setApplicationMetadata] = useState({
-        title: "",
-        companyName: "",
-        position: "",
-        website: ""
-    }) as [IApplication, Dispatch<SetStateAction<IApplication>>]
-    const [inputTerm, setInputTerm] = useState("")
+    const [stageNumber, setStageNumber] = useState(0)
+    const [containerView, setContainerView] = useState('threePanel' as ContainerView)
+    const [loaded, setLoaded] = useState(false)
+    const [loadedRecords, setLoadedRecords] = useState(false)
+    const [jobAppData, setJobAppData] = useState(null as Partial<IApplication>)
+    const [description, setDescription] = useState('')
+    const [applicationRecord, setApplicationRecord] = useState(null as IResume)
+    const [inputTerm, setInputTerm] = useState('')
     const [skills, setSkills] = useState([])
     const [resps, setResps] = useState([])
-    const [draft, setDraft] = useState(resumeToText(new Resume(true, userBasics).getResume()))
-    // If resume is 'cold', we can post an update (in formatting resume stage)
-    const [coldResume, setColdResume] = useState(true)
-    // Set the cool-down interval before next update
-    const [cooldown, setCooldown] = useState(null)
-    const [newResume, setNewResume] = useState(new Resume(false, userBasics).getResume()) as [IResume, Dispatch<SetStateAction<IResume>>]
-    // const [printAction, setPrintAction] = useState(null)
-    let printAction = null
+    const [masterResume, setMasterResume] = useState(null as IResume)
+    const [userResume, setUserResume] = useState(null as IResume)
+    const [draft, setDraft] = useState([] as Descendant[])
+    const [resumeRecord, setResumeRecord] = useState(null as IResume)
+    const [lockedStage, setLockedStage] = useState(true)
+    const [reset, setReset] = useState(false)
 
-    function handleTextarea(e: ChangeEvent) {
-        const { value } = e.target as HTMLTextAreaElement
-        setJobDescription(value)
+    useEffect(() => {
+        if (!loaded) loadData()
+        if (loaded && !loadedRecords && isLocallyAuth) loadRecords(stageNumber)
+        validateStage()
+    }, [isLocallyAuth, stageNumber, jobAppData, description, skills, resps])
+
+    // Load data
+
+    function loadData() {
+        if (!jobAppData) {
+            setJobAppData(application.loadJobApplication())
+        }
+        if (!description) {
+            setDescription(application.loadJobDescription())
+        }
+        if (!skills.length && !resps.length) {
+            const { skills, resps } = application.loadKeywords()
+            setSkills(skills)
+            setResps(resps)
+        }
+        if (!draft.length || (draft.length === 1 && !(draft[0] as CustomElement).children[0].text)) {
+            const loadedDraft = application.loadDraft()
+            setDraft(loadedDraft)
+        }
+        const loadedStage = application.loadStage()
+        setStageNumber(loadedStage)
+        defineContainerView(loadedStage)
+        setLoaded(true)
     }
 
-    function handleInputChange(e: ChangeEvent) {
-        const { name, value }  = e.target as HTMLInputElement
-        setApplicationMetadata(application => ({
-            ...application,
-            [name]: value
-        }))
+    async function loadRecords(stage: number) {
+        try {
+            if (stage > 0) {
+                setApplicationRecord(await application.fetchApplication(userRecord._id))
+            }
+            if (stage > 1) {
+                application.fetchResume(userRecord._id)
+                    .then(resumePayload => {
+                        setResumeRecord(resumePayload); setReset(true)
+                        setUserResume(parseResume(resumePayload))
+                    })
+                application.fetchMasterResume(userRecord._id)
+                    .then(masterRecord => {setMasterResume(parseResume(masterRecord)); setReset(true)})
+                    .catch(() => alert('No master resume configured'))
+            }
+            setLoadedRecords(true)
+        } catch (error) {
+            alert(error)
+        }
     }
+
+    // Stages and view
+
+    function defineContainerView(newStage: number) {
+        // Job Description and Capture Keywords
+        if (newStage === 0 || newStage === 1) setContainerView('twoPanel')
+        // Write your Resume
+        if (newStage === 2) setContainerView('threePanel')
+    }
+
+    async function navigateStages(way: 1 | -1) {
+        const newStage = stageNumber + way
+        if (way === 1) await processData(newStage as 1 | 2)
+        defineContainerView(newStage)
+        setStageNumber(newStage)
+        application.saveStage(newStage)
+    }
+
+    // Process and validate
+
+    async function processData(nextStage: 1 | 2) {
+        try {
+            if (nextStage === 1) {
+                if (description && jobAppData) {
+                    const applicationId = applicationRecord ? applicationRecord._id : null
+                    const applicationPayload = await application.sendApplication(userRecord._id, {
+                        ...jobAppData, jobDescription: description } as IApplication, applicationId)
+                    setApplicationRecord(applicationPayload)
+                }
+            }
+            if (nextStage === 2) {
+                if (skills.length || resps.length) {
+                    await application.sendKeywords(userRecord._id, applicationRecord._id, { skills, resps })
+                    if (!masterResume) application.fetchMasterResume(userRecord._id)
+                        .then(masterRecord => {setMasterResume(parseResume(masterRecord)); setReset(true)})
+                        .catch(() => alert('No master resume configured'))
+                }
+            }
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    function validateStage() {
+        if (stageNumber === 0 && description && jobAppData && validateJobApp()
+            || stageNumber === 1 && (skills.length || resps.length)
+            || stageNumber === 2 && (draft.length === 1 && !(draft[0] as CustomElement).children[0].text)) {
+            setLockedStage(false)
+        } else {
+            setLockedStage(true)
+        }
+    }
+
+    function determineStagePosition(): 'first' | 'mid' | 'last' {
+        if (stageNumber === 0) return 'first'
+        if (stageNumber === 1) return 'mid'
+        if (stageNumber === 2) return 'last' 
+    }
+
+    // Job description
+
+    function handleJobAppData(e: ChangeEvent<HTMLInputElement>) {
+        const { name, value } = e.target
+        setJobAppData(oldData => {
+            const newData = { ...oldData, [name]: value }
+            application.saveJobApplication(newData)
+            return newData
+        })
+    }
+
+    function validateJobApp() {
+        return Object.values(jobAppData).every(value => value)
+    }
+
+    function handleDescription(e: ChangeEvent<HTMLTextAreaElement>) {
+        const { value } = e.target
+        setDescription(value)
+        application.saveJobDescription(value)
+    }
+
+    // Capture keywords
 
     function addKeyword(key: 'skills' | 'resps', value: string) {
         if (key === 'skills') {
-            return setSkills(skills => ([...skills, value]))
+            setSkills(skills => {
+                application.saveKeywords({ skills, resps })
+                return [...skills, value]
+            })
         }
         if (key === 'resps') {
-            return setResps(resps => ([...resps, value]))
+            setResps(resps => {
+                application.saveKeywords({ skills, resps })
+                return [...resps, value]
+            })
         }
     }
 
     function deleteKeyword(key: 'skills' | 'resps', id: string | number) {
         if (key === 'skills') {
-            return setSkills(skills => skills.filter((_, index) => index !== id))
+            setSkills(skills => {
+                application.saveKeywords({ skills, resps })
+                return skills.filter((_, index) => index !== id)
+            })
         }
         if (key === 'resps') {
-            return setResps(resps => resps.filter((_, index) => index !== id))
+            setResps(resps => {
+                application.saveKeywords({ skills, resps })
+                return resps.filter((_, index) => index !== id)
+            })
         }
     }
 
-    function handleNewElement(type: IElementType, element: IElement) {
-        setNewResume(resume => ({
-            ...resume,
-            [typeToKey[type]]: [ ...resume[typeToKey[type]], element ]
-        }))
-    }
+    // Write your resume
 
-    function handleDraft(e: ChangeEvent, newDraft?: string) {
-        if (newDraft) {
-            setDraft(newDraft)
-        } else {
-            const { value } = e.target as HTMLTextAreaElement
-            setDraft(value)
-        }
-        if (stage === "formatResume") {
-            saveDraft()
+    function handleDraft(draft: Descendant[]) {
+        try {
+            setDraft(draft)
+            application.saveDraft(draft)
+            const parsedResume = draftToResume(draft, userResume)
+            setUserResume(parsedResume)
+            setReset(false)
+        } catch (error) {
+            
         }
     }
 
-    function handleApplication(application: IApplication) {
-        setJobDescription(application.jobDescription)
-        setApplicationMetadata(data => {
-            delete application.jobDescription
-            delete application.skillKeywords
-            delete application.responsibilities
-            if (data._id) {
-                delete application._id
-            }
-            return application
-        })
-        if (application.position) {
-            setNewResume(resume => ({ ...resume, basics: { ...resume.basics, label: application.position } }))
+    async function submitResume() {
+        try {
+            const resumeId = resumeRecord ? resumeRecord._id : null
+            setResumeRecord(await application.sendResume(userRecord._id, applicationRecord._id, userResume, draft, resumeId))
+            alert('Saved!')
+        } catch (error) {
+            alert(error)
         }
     }
 
-    function saveDraft() {
-        if (coldResume) {
-            const updatedResume = textToResume(draft, newResume)
-            const { _id } = newResume
-            editResume(_id, updatedResume)
-                .then(resume => {
-                    setNewResume(resume)
-                    setColdResume(false)
-                    setCooldown(setInterval(() => {
-                        setColdResume(true),
-                        setCooldown(cooldown => clearInterval(cooldown))
-                    }, 5000))
-                })
-                .catch(e => alert(e))
-        }
-    }
-
-    function handlePrint(callback: () => void) {
-        return callback()
-    }
-
-    function determineStagePosition(): 'first' | 'mid' | 'last' {
-        const index = stageValues.findIndex(value => value === stage)
-        if (!index) {
-            return 'first'
-        }
-        if (index === stageValues.length - 1) {
-            return 'last'
-        }
-        return 'mid'
-    }
-
-    function processData(way: 1 | -1) {
-        if (way === 1) {
-            if (stage === "writeApplication") {
-                if (!applicationMetadata._id) {
-                    console.log("Creating application")
-                    createApplication({ ...applicationMetadata, jobDescription })
-                        .then(application => {
-                            handleApplication(application)
-                            navigateStages(way)
-                        })
-                        .catch(e => alert(e))
-                } else {
-                    console.log("Editing application")
-                    editApplication(applicationMetadata._id, { ...applicationMetadata, jobDescription })
-                        .then(application => {
-                            handleApplication(application)
-                            navigateStages(way)
-                        })
-                        .catch(e => alert(e))
-                }
-            }
-            if (stage === "captureKeywords") {
-                if (skills.length || resps.length) {
-                    console.log("Adding lists")
-                    addLists(applicationMetadata._id, skills.map(skill => ({ keyword: skill })), resps)
-                        .then(application => {
-                            setSkills(application.skillKeywords.map(({ keyword }) => keyword))
-                            setResps(application.responsibilities)
-                            navigateStages(way)
-                        })
-                        .catch(e => alert(e))
-                }
-            }
-            if (stage === "writeResume") {
-                const parsedResume = textToResume(draft, newResume)
-                console.log(parsedResume)
-                if(!newResume._id) {
-                    console.log("Creating resume")
-                    createResume(applicationMetadata._id, parsedResume)
-                        .then(resume => {
-                            setNewResume(resume)
-                            navigateStages(way)
-                        })
-                        .catch(e => alert(e))
-                } else {
-                    console.log("Updating resume")
-                    editResume(newResume._id, parsedResume)
-                        .then(resume => {
-                            setNewResume(resume)
-                            navigateStages(way)
-                        })
-                }
-            }
-        } else navigateStages(way)
-    }
-
-    function navigateStages(way: 1 | -1) {
-        const index = stageValues.findIndex(value => value === stage)
-        if (index + way === 2) {
-            setContainerView('threePanel')
-        } else {
-            setContainerView('twoPanel')
-        }
-        setStage(stageValues[index + way])
-    }
+    // Reset user data
+    ///////////////////
 
     return (
-        <Layout
-            containerView={containerView}
-            navigation={determineStagePosition()}
-            navigateStages={processData.bind(this)}
-            firstButton={<Link href="/"><a><Button type="secondary">Home</Button></a></Link>}
-            lastButton={<Button type="tertiary" clickHandler={() => handlePrint(printAction)} >Print</Button>}
+        <Main
+            containerView={containerView} headerButtons={[
+                <Link href="/"><a><Button type="secondary" size="sm">Home</Button></a></Link>,
+                <Button type="primary" size="sm" clickHandler={() => logout()}>Sign Out</Button>
+            ]}
+            position={determineStagePosition()} navigateStages={navigateStages.bind(this)} lockedStage={lockedStage}
+            stages={STAGES} activeStage={stageNumber} lastButton={ <Button type="primary" size="md" clickHandler={submitResume}>Save</Button> }
         >
+
             <Head>
                 <title>{SITE_TITLE}</title>
+                <meta charSet="utf-8" />
             </Head>
 
-            {stage === "writeApplication" && (
+            {stageNumber === 0 ? (
                 <>
                     <Panel place={1}>
-                        <Form
-                            formData={parseData(applicationMetadata)}
-                            formHandler={handleInputChange.bind(this)}
-                            action="/api/application"
-                        />
+                        <Form formData={jobAppData} formHandler={handleJobAppData} />
                     </Panel>
                     <Panel place={2}>
-                        <Textarea text={jobDescription} handler={handleTextarea.bind(this)}></Textarea>
+                        <Textarea text={description} handler={handleDescription} placeholder='Write or copy your target job description...' />
                     </Panel>
                 </>
-            )}
-
-            {stage === "captureKeywords" && (
+            ) : ''}
+            {stageNumber === 1 ? (
                 <>
                     <Panel place={1}>
-                        <TextView
-                            input={inputTerm} content={jobDescription}
-                            skills={skills} resps={resps}
-                        />
+                        <TextView content={description} input={inputTerm} skills={skills} resps={resps} />
                     </Panel>
                     <Panel place={2}>
                         <KwdsForm
-                            value={inputTerm} setValue={setInputTerm.bind(this)}
-                            skills={skills} resps={resps}
-                            addKeyword={addKeyword.bind(this)}
-                            deleteKeyword={deleteKeyword.bind(this)}
+                            value={inputTerm} setValue={setInputTerm.bind(this)} skills={skills} resps={resps}
+                            addKeyword={addKeyword.bind(this)} deleteKeyword={deleteKeyword.bind(this)}
                         />
                     </Panel>
                 </>
-            )}
-
-            {stage === "writeResume" && (
+            ) : ''}
+            {stageNumber === 2 ? (
                 <>
                     <Panel place={1}>
-                        <TextView
-                            input={inputTerm} content={jobDescription}
-                            skills={skills} resps={resps}
-                        />
+                        <TextView content={description} input={inputTerm} skills={skills} resps={resps} />
                     </Panel>
                     <Panel place={2}>
-                        <MatchCounter skills={skills} resps={resps} resume={draft.toLowerCase()} ></MatchCounter>
+                        <MatchCounter skills={skills} resps={resps} resume={draftToString(draft)} />
                     </Panel>
                     <Panel place={3}>
-                        <DraftTxtArea text={draft} handler={handleDraft} updateResume={handleNewElement} />
+                        <DraftEditor resume={userResume || masterResume} draft={!reset ? draft : []} handleDraft={handleDraft} />
                     </Panel>
                 </>
-            )}
-
-            {stage === "formatResume" && (
-                <>
-                    <Panel place={1}>
-                        <DraftTxtArea text={draft} handler={handleDraft} updateResume={handleNewElement} />
-                    </Panel>
-                    <Panel place={2}>
-                        <ResumePreview id={newResume._id} setPrintAction={callback => printAction = callback} />
-                    </Panel>
-                </>
-            )}
-        </Layout>
+            ) : ''}
+        </Main>
     )
 }
 
-function parseData(obj: IApplication | IResume) {
-    delete obj._id
-    delete obj.__v
-    delete obj.createdAt
-    delete obj.updatedAt
-    return obj
+function parseResume({ basics, skills, certificates, education, work, projects }: IResume) {
+    return { basics, skills, certificates, education, work, projects } as IResume
 }
