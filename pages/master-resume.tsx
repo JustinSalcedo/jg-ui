@@ -40,6 +40,8 @@ export default function MasterResume() {
                 setMasterResume(resumeRecord); setResume(resumeRecord)
                 setReset(true)
             })
+            .catch((e: Error) => e.message !== 'Undefined response'
+                && alert('Something bad happened'))
         setLoaded(true)
     }
 

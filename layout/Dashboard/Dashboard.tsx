@@ -8,6 +8,7 @@ import { IApplication } from "../../types/index";
 import styles from './Dashboard.module.css'
 import utilStyles from '../../styles/utils.module.css'
 import { dateToMonthDay } from "../../lib/formatDate";
+import { shrinkTitle } from "../../lib/formatTitles";
 
 export default function Dashboard({ applications }: { applications?: IApplication[] }) {
     return (
@@ -25,7 +26,7 @@ export default function Dashboard({ applications }: { applications?: IApplicatio
                     {applications && applications.length ? (
                         <ul className={styles.results + ' ' + utilStyles['hide-scrollbar']}>
                             {applications.map(application => ( <li key={application._id} className={styles.application}>
-                                <Link href={"/application/" + application._id} ><a><h3>{application.title}</h3></a></Link>
+                                <Link href={"/application/" + application._id} ><a><h3>{shrinkTitle(application.title)}</h3></a></Link>
                                 <span>{dateToMonthDay(application.createdAt)}</span>
                                 <p>@ {application.companyName}</p>
                             </li> ))}

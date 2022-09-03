@@ -1,7 +1,7 @@
 import Button from "./Button"
 
 export default function Navigation({
-    navigateStages, position, lockedStage, firstButton, lastButton, leftButton, rightButton
+    navigateStages, position, lockedStage, firstButton, lastButton, leftButton, rightButton, fixedButton
 }: {
     navigateStages: (way: 1 | -1) => void
     position?: 'first' | 'mid' | 'last'
@@ -9,7 +9,8 @@ export default function Navigation({
     firstButton?: React.ReactNode
     lastButton?: React.ReactNode
     leftButton?: string
-    rightButton?: string 
+    rightButton?: string
+    fixedButton?: React.ReactNode
 }) {
     return (
         <>
@@ -22,6 +23,7 @@ export default function Navigation({
                     <Button type={lockedStage ? 'disabled' : 'primary'} clickHandler={() => !lockedStage && navigateStages(1)}>{rightButton || 'Next'}</Button>
                 ): '' }
                 {position === 'last' && lastButton ? lastButton : ''}
+                {fixedButton ? fixedButton : ''}
             </div>
             {/* @ts-ignore */}
             <style jsx>{`

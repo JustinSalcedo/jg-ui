@@ -90,6 +90,17 @@ export default function App({ Component, pageProps, domain, clientId, host }: Ap
     }
   }
 
+  async function logout() {
+    setIsLocallyAuth(false)
+    setUserRecord(null)
+    //
+    setUser(null)
+    setIsAuthenticated(false)
+    //
+    sessionStorage.clear()
+    router.push('/')
+  }
+
   async function loadUser({ sub, name, email, email_verified }: User) {
     try {
       const userPayload = await client.loginUser({ sub, name, email, email_verified })
@@ -115,7 +126,7 @@ export default function App({ Component, pageProps, domain, clientId, host }: Ap
     >
       <UserContext.Provider value={{
         userRecord, handleUserRecord, login, isAuth: isAuthenticated,
-        isLoading, logout: async () => {}, isLocallyAuth
+        isLoading, logout: logout, isLocallyAuth
       }}>
         <Component {...pageProps} />
       </UserContext.Provider>
