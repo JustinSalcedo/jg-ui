@@ -196,6 +196,10 @@ export default class Application {
 
     public deleteLocalData() {
         if (this.isAuth) {
+            window.sessionStorage.removeItem('application')
+            window.sessionStorage.removeItem('applicationId')
+            window.sessionStorage.removeItem('resumeId')
+            window.sessionStorage.removeItem('stage')
             window.sessionStorage.removeItem('description')
             window.sessionStorage.removeItem('keywords')
             window.sessionStorage.removeItem('draft')

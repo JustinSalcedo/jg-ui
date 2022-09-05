@@ -23,7 +23,7 @@ export default function ApplicationEditor({
     userResume, masterResume, reset,
     processData, logout, handleJobAppData, handleDescription,
     addKeyword, deleteKeyword, handleDraft,
-    submitResume, saveStage
+    submitResume, saveStage, loadStage
 }: {
     jobAppData: Partial<IApplication>, description: string, skills: string[], resps: string[]
     draft: Descendant[], userResume: IResume, masterResume: IResume, reset: boolean
@@ -31,8 +31,8 @@ export default function ApplicationEditor({
     handleJobAppData: ChangeEventHandler<HTMLInputElement>, handleDescription: ChangeEventHandler<HTMLTextAreaElement>
     addKeyword: (key: 'skills' | 'resps', value: string) => void
     deleteKeyword: (key: 'skills' | 'resps', id: string | number) => void
-    handleDraft: (draft: Descendant[]) => void
-    submitResume: () => void, saveStage?: (stage: number) => void
+    handleDraft: (draft: Descendant[]) => void, submitResume: () => void
+    saveStage?: (stage: number) => void, loadStage?: () => number
 }) {
 
     const [stageNumber, setStageNumber] = useState(0)
@@ -41,6 +41,10 @@ export default function ApplicationEditor({
     const [lockedStage, setLockedStage] = useState(true)
 
     useEffect(() => {
+        if (loadStage) {
+            setStageNumber(loadStage())
+            defineContainerView(loadStage())
+        }
         validateStage()
     }, [stageNumber, jobAppData, description, skills, resps])
 
@@ -54,11 +58,15 @@ export default function ApplicationEditor({
     }
 
     async function navigateStages(way: 1 | -1) {
-        const newStage = stageNumber + way
-        if (way === 1) await processData(newStage as 1 | 2)
-        defineContainerView(newStage)
-        setStageNumber(newStage)
-        if (saveStage) saveStage(newStage)
+        try {
+            const newStage = stageNumber + way
+            if (way === 1) await processData(newStage as 1 | 2)
+            defineContainerView(newStage)
+            setStageNumber(newStage)
+            if (saveStage) saveStage(newStage)
+        } catch (error) {
+            alert(error)
+        }
     }
 
     // Process and validate
